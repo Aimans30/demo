@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import SearchBar from "../SearchBar/SearchBar";
-import "./RestaurantMenu.css";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import './RestaurantMenu.css';
 
-function RestaurantMenu({ addToCart }) {
+function RestaurantMenu() {
   const [restaurant, setRestaurant] = useState(null);
-  const [filteredMenu, setFilteredMenu] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { id } = useParams();
+  const [cart, setCart] = useState([]); // State to manage cart
   const [popupVisible, setPopupVisible] = useState(false);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
-        const response = await axios.get(`/api/restaurants/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/restaurants/${id}`);
         setRestaurant(response.data);
-        setFilteredMenu(response.data.menu || []);
       } catch (error) {
         console.error(error);
       }
@@ -25,9 +24,9 @@ function RestaurantMenu({ addToCart }) {
   }, [id]);
 
   const handleSizeChange = (itemId, size) => {
-    setRestaurant((prevState) => ({
+    setRestaurant(prevState => ({
       ...prevState,
-      menu: prevState.menu.map((menuItem) => {
+      menu: prevState.menu.map(menuItem => {
         if (menuItem._id === itemId) {
           return {
             ...menuItem,
@@ -40,9 +39,9 @@ function RestaurantMenu({ addToCart }) {
   };
 
   const handleQuantityChange = (itemId, increment) => {
-    setRestaurant((prevState) => ({
+    setRestaurant(prevState => ({
       ...prevState,
-      menu: prevState.menu.map((menuItem) => {
+      menu: prevState.menu.map(menuItem => {
         if (menuItem._id === itemId) {
           const newQuantity = (menuItem.quantity || 0) + increment;
           return {
@@ -58,35 +57,34 @@ function RestaurantMenu({ addToCart }) {
   const handleAddToCart = (item) => {
     if (item.selectedSize) {
       const itemToCart = {
-        ...item,
         id: item._id,
-        restaurantId: id,
+        name: item.itemName,
+        price: item.sizes[item.selectedSize],
         quantity: item.quantity || 1,
         size: item.selectedSize,
-        price: item.sizes[item.selectedSize],
       };
 
-      addToCart(itemToCart);
+      setCart(prevCart => {
+        const updatedCart = [...prevCart, itemToCart];
+        localStorage.setItem('cartItems', JSON.stringify(updatedCart));
+        return updatedCart;
+      });
 
+      // Show popup
       setPopupVisible(true);
       setTimeout(() => setPopupVisible(false), 3000);
     } else {
-      alert("Please select a size before adding to cart.");
+      alert('Please select a size before adding to cart.');
     }
   };
 
-  const handleSearch = (searchTerm) => {
-    if (!restaurant) return;
-
-    if (searchTerm) {
-      const filtered = restaurant.menu.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredMenu(filtered);
-    } else {
-      setFilteredMenu(restaurant.menu || []);
-    }
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
   };
+
+  const filteredMenu = restaurant ? restaurant.menu.filter(item =>
+    item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
 
   if (!restaurant) {
     return <p>Loading...</p>;
@@ -95,22 +93,27 @@ function RestaurantMenu({ addToCart }) {
   return (
     <div className="restaurant-menu-page">
       <h2>{restaurant.name}</h2>
-      <img
-        src={restaurant.image}
-        alt={restaurant.name}
-        className="restaurant-image"
-      />
+      <img src={restaurant.image} alt={restaurant.name} className="restaurant-image" />
       <p>{restaurant.address}</p>
 
-      <SearchBar restaurantId={id} onSearch={handleSearch} />
+      {/* Search Bar */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search for items..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+      </div>
 
       <h3>Menu:</h3>
       <div className="menu-list">
-        {filteredMenu.map((item) => (
+        {filteredMenu.map(item => (
           <div key={item._id} className="menu-card">
-            <h4>{item.name}</h4>
+            <h4>{item.itemName}</h4>
             <p>₹{item.sizes[item.selectedSize]}</p>
 
+            {/* Dropdown for Size Selection */}
             <div className="dropdown-selector">
               <label htmlFor={`size-${item._id}`}>Size:</label>
               <select
@@ -119,14 +122,13 @@ function RestaurantMenu({ addToCart }) {
                 onChange={(e) => handleSizeChange(item._id, e.target.value)}
               >
                 <option value="">Select Size</option>
-                {Object.keys(item.sizes).map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
+                {Object.keys(item.sizes).map(size => (
+                  <option key={size} value={size}>{size}</option>
                 ))}
               </select>
             </div>
 
+            {/* Quantity Selector */}
             <div className="quantity-counter">
               <button
                 disabled={item.quantity <= 0}
@@ -134,13 +136,21 @@ function RestaurantMenu({ addToCart }) {
               >
                 -
               </button>
-              <input type="text" value={item.quantity || 0} readOnly />
+              <input
+                type="text"
+                value={item.quantity || 0}
+                readOnly
+              />
               <button onClick={() => handleQuantityChange(item._id, 1)}>
                 +
               </button>
             </div>
 
-            <button className="add-to-cart" onClick={() => handleAddToCart(item)}>
+            {/* Add to Cart Button */}
+            <button
+              className="add-to-cart"
+              onClick={() => handleAddToCart(item)}
+            >
               Add to Cart
             </button>
           </div>
