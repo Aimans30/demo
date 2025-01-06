@@ -15,7 +15,7 @@ import RestaurantPanel from "./components/RestaurantPanel/RestaurantPanel";
 import RestaurantMenu from "./components/RestaurantMenu/RestaurantMenu";
 import PrivateRoute from "./PrivateRoute";
 import Cart from "./components/Cart/Cart";
-import YourOrders from "./components/YourOrders";
+import YourOrders from "./components/Orders/YourOrders";
 import Profile from "./components/Profile/Profile"; // Import the Profile component
 import "./App.css";
 
