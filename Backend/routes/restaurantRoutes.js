@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Restaurant, MenuItem } = require('../models/restaurantModel');
+const Restaurant = require('../models/restaurantModel');
 const authenticateToken = require('../middleware/authMiddleware');
 const User = require('../models/User');
 const Order = require('../models/orders');
@@ -20,7 +20,7 @@ const isRestaurantOwner = async (req, res, next) => {
   }
 };
 
-// Protected route for restaurant owners (example)
+// Protected route for restaurant owners
 router.get('/dashboard', authenticateToken, isRestaurantOwner, async (req, res) => {
   res.json({ message: 'Welcome to the restaurant dashboard', user: req.user });
 });
@@ -28,11 +28,26 @@ router.get('/dashboard', authenticateToken, isRestaurantOwner, async (req, res) 
 // GET /api/restaurants (Public route to fetch all restaurants)
 router.get('/', async (req, res) => {
   try {
-    const restaurants = await Restaurant.find().populate('menu', 'name category');
+    const restaurants = await Restaurant.find();
     res.json(restaurants);
   } catch (err) {
     console.error('Error fetching restaurants:', err.message);
     res.status(500).json({ message: 'Server error fetching restaurants' });
+  }
+});
+
+// GET /api/restaurant/:restaurantId (Fetch restaurant by ID)
+router.get('/:restaurantId', async (req, res) => {
+  const { restaurantId } = req.params;
+  try {
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+    res.json(restaurant);
+  } catch (err) {
+    console.error('Error fetching restaurant:', err.message);
+    res.status(500).json({ message: 'Server error fetching restaurant' });
   }
 });
 
@@ -51,30 +66,6 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// Search for menu items within a specific restaurant
-router.get('/:restaurantId/menu/search', async (req, res) => {
-  const { restaurantId } = req.params;
-  const { q } = req.query;
-  try {
-    if (!q) {
-      return res.status(400).json({ message: 'Query parameter (q) is required' });
-    }
-    const restaurant = await Restaurant.findById(restaurantId);
-    if (!restaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
-    }
-
-    const menuItems = await MenuItem.find({
-      restaurant: restaurantId,
-      name: { $regex: q, $options: 'i' },
-    });
-    res.json(menuItems);
-  } catch (error) {
-    console.error('Error searching menu items:', error.message);
-    res.status(500).json({ message: 'Server error searching menu items' });
-  }
-});
-
 // GET /api/restaurant/orders (fetch pending orders for the logged-in restaurant)
 router.get('/orders', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
@@ -84,8 +75,7 @@ router.get('/orders', authenticateToken, isRestaurantOwner, async (req, res) => 
     }
 
     const orders = await Order.find({ restaurant: restaurant._id, orderStatus: 'Placed' })
-      .populate('customer', 'username')
-      .populate('items.menuItem', 'name');
+      .populate('customer', 'username');
     res.json(orders);
   } catch (err) {
     console.error('Error fetching orders:', err.message);
@@ -125,8 +115,7 @@ router.get('/menu', authenticateToken, isRestaurantOwner, async (req, res) => {
       return res.status(404).json({ message: 'Restaurant not found' });
     }
 
-    const menuItems = await MenuItem.find({ restaurant: restaurant._id });
-    res.json(menuItems);
+    res.json(restaurant.menu);
   } catch (err) {
     console.error('Error fetching menu:', err.message);
     res.status(500).json({ message: 'Server error fetching menu' });
@@ -141,22 +130,14 @@ router.post('/menu', authenticateToken, isRestaurantOwner, async (req, res) => {
       return res.status(404).json({ message: 'Restaurant not found' });
     }
 
-    const { name, category, sizes } = req.body;
-    if (!name || !category || !sizes || typeof sizes !== 'object') {
+    const { name, sizes } = req.body;
+    if (!name || !sizes || typeof sizes !== 'object') {
       return res.status(400).json({ message: 'Missing or invalid required fields' });
     }
 
-    const newItem = new MenuItem({
-      name,
-      category,
-      sizes,
-      restaurant: restaurant._id,
-    });
-
-    await newItem.save();
-    restaurant.menu.push(newItem._id);
+    restaurant.menu.push({ name, sizes });
     await restaurant.save();
-    res.status(201).json(newItem);
+    res.status(201).json(restaurant.menu[restaurant.menu.length - 1]);
   } catch (err) {
     console.error('Error adding menu item:', err.message);
     res.status(500).json({ message: 'Server error adding menu item' });
@@ -166,23 +147,26 @@ router.post('/menu', authenticateToken, isRestaurantOwner, async (req, res) => {
 // PATCH /api/restaurant/menu/:itemId (edit an existing menu item)
 router.patch('/menu/:itemId', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
-    const { name, category, sizes } = req.body;
-    if (!name && !category && !sizes) {
+    const { name, sizes } = req.body;
+    if (!name && !sizes) {
       return res.status(400).json({ message: 'No fields to update provided' });
     }
 
-    const updateFields = { name, category, sizes };
-    const updatedItem = await MenuItem.findByIdAndUpdate(
-      req.params.itemId,
-      updateFields,
-      { new: true }
-    );
+    const restaurant = await Restaurant.findOne({ owner: req.user.userId });
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
 
-    if (!updatedItem) {
+    const menuItemIndex = restaurant.menu.findIndex(item => item._id.toString() === req.params.itemId);
+    if (menuItemIndex === -1) {
       return res.status(404).json({ message: 'Menu item not found' });
     }
 
-    res.json(updatedItem);
+    if (name) restaurant.menu[menuItemIndex].name = name;
+    if (sizes) restaurant.menu[menuItemIndex].sizes = sizes;
+
+    await restaurant.save();
+    res.json(restaurant.menu[menuItemIndex]);
   } catch (err) {
     console.error('Error updating menu item:', err.message);
     res.status(500).json({ message: 'Server error updating menu item' });
@@ -192,11 +176,18 @@ router.patch('/menu/:itemId', authenticateToken, isRestaurantOwner, async (req, 
 // DELETE /api/restaurant/menu/:itemId (delete a menu item)
 router.delete('/menu/:itemId', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
-    const deletedItem = await MenuItem.findByIdAndDelete(req.params.itemId);
-    if (!deletedItem) {
+    const restaurant = await Restaurant.findOne({ owner: req.user.userId });
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    const menuItemIndex = restaurant.menu.findIndex(item => item._id.toString() === req.params.itemId);
+    if (menuItemIndex === -1) {
       return res.status(404).json({ message: 'Menu item not found' });
     }
 
+    restaurant.menu.splice(menuItemIndex, 1);
+    await restaurant.save();
     res.json({ message: 'Menu item deleted' });
   } catch (err) {
     console.error('Error deleting menu item:', err.message);
