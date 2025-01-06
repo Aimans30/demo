@@ -1,173 +1,185 @@
+/* RestaurantMenu.css */
+
 .restaurant-menu-page {
-    padding: 20px;
-    background-color: #f8f9fa;
-    text-align: center;
+  padding: 50px;
+  background-color: #f8f9fa;
+  text-align: center;
 }
 
 .restaurant-image {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    margin-bottom: 20px;
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.menu-section-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  text-align: left;
 }
 
 .menu-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center cards */
+  gap: 20px; /* Add spacing between cards */
 }
 
 .menu-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 250px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 200px; /* Adjust card width */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.menu-card:hover {
+  transform: scale(1.05); /* Add hover effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .menu-card h4 {
-    margin-bottom: 8px;
-    color: #333;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .menu-card p {
-    margin-bottom: 12px;
-    color: #555;
+  color: #555;
+  font-size: 0.9rem;
 }
 
 .dropdown-selector {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 .dropdown-selector select {
-    width: 100%;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
-    background-color: #fff;
-    transition: border-color 0.3s ease;
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
 }
 
 .dropdown-selector select:focus {
-    border-color: #007bff;
+  border-color: #007bff;
 }
 
 .quantity-counter {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 .quantity-counter button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
+  background-color: #fac744;
+  color: #333;
+  border: none;
+  padding: 5px 15px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
 }
 
 .quantity-counter input {
-    width: 40px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+  width: 50px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .quantity-counter button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .quantity-counter button:hover:not(:disabled) {
-    background-color: #0056b3;
+  background-color: #e6b800;
 }
 
 .add-to-cart {
-    margin-top: 15px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  margin-top: 15px;
+  background-color: #fac744;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
 .add-to-cart:hover {
-    background-color: #218838;
+  background-color: #e6b800;
 }
-.dropdown-selector {
-    margin: 10px 0;
-  }
-  
-  .dropdown-selector label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .dropdown-selector select {
-    width: 100%;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-    transition: border-color 0.3s ease;
-  }
-  
-  .dropdown-selector select:focus {
-    border-color: #007bff;
-  }
-  
-  .popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: orange;
-    color: white;
-    text-align: center;
-    padding: 0.1rem 0.2rem; /* Reduced padding further */
-    font-size: 0.75rem; /* Smaller font size */
-    z-index: 1000; /* Ensure it appears above other elements */
-    transition: opacity 0.3s ease-out;
-    opacity: 0;
-    visibility: hidden;
-  }
-  
-  .popup.show {
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  /* RestaurantMenu.css */
+
+.popup {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fac744;
+  color: #333;
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 1rem;
+  z-index: 1100;
+  border-radius: 5px;
+  transition: opacity 0.3s ease-out;
+  opacity: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popup.show {
+  opacity: 1;
+  visibility: visible;
+}
 
 .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar input {
+  width: 300px; /* Increased search bar width */
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+.search-bar input::placeholder {
+  color: #aaa;
+}
+
+@media (max-width: 768px) {
+  .menu-card {
+    width: 100%; /* Full width for smaller screens */
   }
-  
+
   .search-bar input {
-    width: 200px;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    width: 200px; /* Adjust search bar width for smaller screens */
   }
-  
-  .search-bar input::placeholder {
-    color: #aaa;
-  }
-  
+}
