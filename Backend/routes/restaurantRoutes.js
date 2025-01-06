@@ -5,7 +5,6 @@ const authenticateToken = require('../middleware/authMiddleware');
 const User = require('../models/User');
 const Order = require('../models/orders');
 
-// Middleware to check if the user is a restaurant owner
 const isRestaurantOwner = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId);
@@ -15,28 +14,23 @@ const isRestaurantOwner = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error('Error in isRestaurantOwner middleware:', error.message);
     res.status(500).json({ message: 'Server error in isRestaurantOwner middleware' });
   }
 };
 
-// Protected route for restaurant owners
 router.get('/dashboard', authenticateToken, isRestaurantOwner, async (req, res) => {
   res.json({ message: 'Welcome to the restaurant dashboard', user: req.user });
 });
 
-// GET /api/restaurants (Public route to fetch all restaurants)
 router.get('/', async (req, res) => {
   try {
     const restaurants = await Restaurant.find();
     res.json(restaurants);
   } catch (err) {
-    console.error('Error fetching restaurants:', err.message);
     res.status(500).json({ message: 'Server error fetching restaurants' });
   }
 });
 
-// GET /api/restaurant/:restaurantId (Fetch restaurant by ID)
 router.get('/:restaurantId', async (req, res) => {
   const { restaurantId } = req.params;
   try {
@@ -46,39 +40,20 @@ router.get('/:restaurantId', async (req, res) => {
     }
     res.json(restaurant);
   } catch (err) {
-    console.error('Error fetching restaurant:', err.message);
     res.status(500).json({ message: 'Server error fetching restaurant' });
   }
 });
 
-// Search for restaurants (public)
-router.get('/search', async (req, res) => {
-  const { q } = req.query;
-  try {
-    if (!q) {
-      return res.status(400).json({ message: 'Query parameter (q) is required' });
-    }
-    const restaurants = await Restaurant.find({ name: { $regex: q, $options: 'i' } });
-    res.json(restaurants);
-  } catch (error) {
-    console.error('Error searching restaurants:', error.message);
-    res.status(500).json({ message: 'Server error searching restaurants' });
-  }
-});
-
-// GET /api/restaurant/orders (fetch pending orders for the logged-in restaurant)
 router.get('/orders', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
     const restaurant = await Restaurant.findOne({ owner: req.user.userId });
     if (!restaurant) {
       return res.status(404).json({ message: 'Restaurant not found for this user' });
     }
-
     const orders = await Order.find({ restaurant: restaurant._id, orderStatus: 'Placed' })
       .populate('customer', 'username');
     res.json(orders);
   } catch (err) {
-    console.error('Error fetching orders:', err.message);
     res.status(500).json({ message: 'Server error fetching orders' });
   }
 });

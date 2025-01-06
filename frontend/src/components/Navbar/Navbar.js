@@ -1,13 +1,25 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { FaShoppingCart, FaBars } from "react-icons/fa";
-import SearchBar from "../SearchBar/SearchBar";
 
-function Navbar({ isLoggedIn, userRole, onLogout }) {
+function Navbar({ onCartClick }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
   const [isOpen, setIsOpen] = useState(false);
+
+  const isLoggedIn = !!localStorage.getItem("userToken");
+  const userRole = localStorage.getItem("userRole");
+
+  const handleLogout = () => {
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    localStorage.removeItem("cartItems");
+    navigate("/login");
+  };
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -77,7 +89,7 @@ function Navbar({ isLoggedIn, userRole, onLogout }) {
                 )}
 
                 <li className="nav-item">
-                  <button onClick={onLogout} className="nav-links">
+                  <button onClick={handleLogout} className="nav-links logout-button">
                     Logout
                   </button>
                 </li>
@@ -90,17 +102,13 @@ function Navbar({ isLoggedIn, userRole, onLogout }) {
       {isHomePage && (
         <div className={`content ${isOpen ? "shifted" : ""}`}>
           <div className="header">
-            <div className="search-bar-container">
-              <SearchBar />
-            </div>
-            <div className="cart-icon">
-              <Link to="/cart">
-                <FaShoppingCart />
-              </Link>
-            </div>
-          </div>
-          <div className="main-content">
-            <h1 className="home-heading">Your Local go to..</h1>
+            {isLoggedIn && (
+              <div className="cart-icon">
+                <button onClick={onCartClick}>
+                  <FaShoppingCart />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

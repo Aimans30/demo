@@ -16,7 +16,7 @@ import RestaurantMenu from "./components/RestaurantMenu/RestaurantMenu";
 import PrivateRoute from "./PrivateRoute";
 import Cart from "./components/Cart/Cart";
 import YourOrders from "./components/Orders/YourOrders";
-import Profile from "./components/Profile/Profile"; // Import the Profile component
+import Profile from "./components/Profile/Profile";
 import "./App.css";
 
 function App() {
@@ -29,13 +29,11 @@ function App() {
     const fetchUserStatus = async () => {
       const token = localStorage.getItem("token");
       const storedRole = localStorage.getItem("userRole");
-
       if (token) {
         setIsLoggedIn(true);
         setUserRole(storedRole);
       }
     };
-
     fetchUserStatus();
   }, []);
 
@@ -54,7 +52,6 @@ function App() {
     try {
       const response = await axios.post("/api/users/login", credentials);
       const { token, user } = response.data;
-
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", user.role);
       setIsLoggedIn(true);
@@ -76,51 +73,56 @@ function App() {
   const handleSignup = (user) => {
     setIsLoggedIn(true);
     setUserRole(user.role);
-
-    if (user.role === "admin") {
-      window.location.href = "/admin-panel";
-    } else if (user.role === "restaurant") {
-      window.location.href = "/restaurant";
-    } else {
-      window.location.href = "/";
-    }
+    const redirectPath = user.role === "admin" ? "/admin-panel" : 
+                        user.role === "restaurant" ? "/restaurant" : "/";
+    window.location.href = redirectPath;
   };
 
   const addToCart = (item) => {
-    if (cartItems.length === 0) {
-      // If cart is empty, add the item
-      setCartItems([item]);
-    } else if (cartItems[0].restaurantId === item.restaurantId) {
-      // Check if item already exists in cart
-      const existingItemIndex = cartItems.findIndex(
-        (cartItem) => cartItem.id === item.id && cartItem.size === item.size
-      );
-
-      if (existingItemIndex !== -1) {
-        // Update quantity if item already exists
-        const updatedCartItems = [...cartItems];
-        updatedCartItems[existingItemIndex].quantity += item.quantity;
-        setCartItems(updatedCartItems);
-      } else {
-        // Add new item to cart
-        setCartItems([...cartItems, item]);
+    setCartItems(currentItems => {
+      if (currentItems.length === 0) {
+        return [item];
       }
-    } else {
-      // Alert if adding item from a different restaurant
-      alert("You can only add items from the same restaurant to the cart.");
-    }
+
+      if (currentItems[0].restaurantId === item.restaurantId) {
+        const existingItemIndex = currentItems.findIndex(
+          cartItem => cartItem.id === item.id && cartItem.size === item.size
+        );
+
+        if (existingItemIndex !== -1) {
+          const updatedItems = [...currentItems];
+          updatedItems[existingItemIndex].quantity += item.quantity;
+          return updatedItems;
+        }
+
+        return [...currentItems, item];
+      }
+
+      alert(`Cannot add items from different restaurants. Your cart currently contains items from ${currentItems[0].restaurantName}`);
+      return currentItems;
+    });
+    setIsCartOpen(true);
   };
 
-  const toggleCart = () => {
-    setIsCartOpen(!isCartOpen);
+  const updateCartItemQuantity = (itemId, size, increment) => {
+    setCartItems(currentItems => {
+      return currentItems.map(item => {
+        if (item.id === itemId && item.size === size) {
+          const newQuantity = item.quantity + increment;
+          if (newQuantity <= 0) {
+            return null;
+          }
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      }).filter(Boolean);
+    });
   };
 
-  const closeCart = () => {
-    setIsCartOpen(false);
-  };
+  const toggleCart = () => setIsCartOpen(!isCartOpen);
+  const closeCart = () => setIsCartOpen(false);
 
   const handlePlaceOrder = () => {
-    console.log("Placing order with items:", cartItems);
     setCartItems([]);
     localStorage.removeItem("cartItems");
     closeCart();
@@ -159,25 +161,11 @@ function App() {
             path="/restaurant/:id"
             element={<RestaurantMenu addToCart={addToCart} />}
           />
-          <Route
-            path="/cart"
-            element={
-              <Cart
-                cartItems={cartItems}
-                onClose={closeCart}
-                onPlaceOrder={handlePlaceOrder}
-              />
-            }
-          />
           <Route path="/your-orders" element={<YourOrders />} />
           <Route
             path="/profile"
             element={
-              isLoggedIn ? (
-                <Profile />
-              ) : (
-                <Navigate to="/login" replace={true} />
-              )
+              isLoggedIn ? <Profile /> : <Navigate to="/login" replace={true} />
             }
           />
         </Routes>
@@ -186,6 +174,7 @@ function App() {
             cartItems={cartItems}
             onClose={closeCart}
             onPlaceOrder={handlePlaceOrder}
+            updateQuantity={updateCartItemQuantity}
           />
         )}
       </div>
