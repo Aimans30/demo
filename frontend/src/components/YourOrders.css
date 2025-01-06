@@ -1,0 +1,29 @@
+.your-orders-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .your-orders-loading,
+  .your-orders-error {
+    text-align: center;
+    color: #333;
+    font-size: 18px;
+  }
+  
+  .your-orders-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .your-order-item {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+  }
+  
+  .order-details p {
+    margin: 5px 0;
+  }
+  

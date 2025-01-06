@@ -2,41 +2,88 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/orders'); // Import Order model
 
-// POST /api/orders
-// Place a new order
-router.post('/api/orders', async (req, res) => {
+// POST /api/orders - Place a new order
+router.post('/', async (req, res) => {
   try {
-    const orderData = req.body;
+    const { restaurant, customer, items, totalAmount } = req.body;
 
-    // --- Basic Input Validation (Add more as needed) ---
-    if (!orderData.restaurant || !orderData.customer || !orderData.items || !orderData.totalAmount) {
-      return res.status(400).json({ message: "Incomplete order data provided" });
+    // Input Validation
+    if (!restaurant) {
+      return res.status(400).json({ message: "Restaurant ID is required." });
     }
-    // --- End of Input Validation ---
+    if (!customer) {
+      return res.status(400).json({ message: "Customer ID is required." });
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "Order items are required." });
+    }
+    if (!totalAmount || totalAmount <= 0) {
+      return res.status(400).json({ message: "Valid total amount is required." });
+    }
 
-    const order = new Order(orderData);
+    // Create a new order
+    const order = new Order({ restaurant, customer, items, totalAmount });
     await order.save();
 
-    // Get the restaurant owner's ID:
-    const ownerId = await order.getRestaurantOwnerId();
+    // Fetch the restaurant owner's ID (replace with actual logic if needed)
+    const ownerId = await order.getRestaurantOwnerId?.();
+    if (!ownerId) {
+      return res.status(404).json({ message: "Restaurant owner not found." });
+    }
 
-    // Now you have the ownerId, you can use it for:
-    // - Sending notifications to the owner (e.g., using WebSockets or email)
-    // - Displaying orders to the correct owner in their dashboard
-    // - Filtering orders by owner, etc.
-    console.log("Restaurant Owner ID:", ownerId); // Replace with your notification/logic
+    console.log("Restaurant Owner ID:", ownerId); // Debugging/Notifications logic
 
-    res.status(201).json({ order });
+    res.status(201).json({ message: "Order placed successfully.", order });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error placing order:", error.message);
+    res.status(500).json({ message: 'Server error.', error: error.message });
   }
 });
 
-// You can add more routes for orders here:
-// - GET /api/orders (get all orders)
-// - GET /api/orders/:orderId (get a specific order)
-// - PATCH /api/orders/:orderId (update order status, etc.)
-// - (Add authentication/authorization middleware to protect these routes)
+// GET /api/orders - Retrieve all orders
+router.get('/', async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error("Error retrieving orders:", error.message);
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+});
+
+// GET /api/orders/:orderId - Retrieve a specific order by ID
+router.get('/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    res.status(200).json({ order });
+  } catch (error) {
+    console.error("Error retrieving order:", error.message);
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+});
+
+// PATCH /api/orders/:orderId - Update order status or details
+router.patch('/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const updates = req.body;
+
+    const order = await Order.findByIdAndUpdate(orderId, updates, { new: true });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    res.status(200).json({ message: "Order updated successfully.", order });
+  } catch (error) {
+    console.error("Error updating order:", error.message);
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+});
 
 module.exports = router;
