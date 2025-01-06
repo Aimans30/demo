@@ -3,11 +3,10 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import './RestaurantMenu.css';
 
-function RestaurantMenu() {
+function RestaurantMenu({ addToCart }) {
   const [restaurant, setRestaurant] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { id } = useParams();
-  const [cart, setCart] = useState([]); // State to manage cart
   const [popupVisible, setPopupVisible] = useState(false);
 
   useEffect(() => {
@@ -62,15 +61,15 @@ function RestaurantMenu() {
         price: item.sizes[item.selectedSize],
         quantity: item.quantity || 1,
         size: item.selectedSize,
+        restaurantId: id,
+        restaurantName: restaurant.name
       };
 
-      setCart(prevCart => {
-        const updatedCart = [...prevCart, itemToCart];
-        localStorage.setItem('cartItems', JSON.stringify(updatedCart));
-        return updatedCart;
-      });
-
-      // Show popup
+      addToCart(itemToCart);
+      
+      // Reset quantity after adding to cart
+      handleQuantityChange(item._id, -item.quantity);
+      
       setPopupVisible(true);
       setTimeout(() => setPopupVisible(false), 3000);
     } else {
@@ -96,7 +95,6 @@ function RestaurantMenu() {
       <img src={restaurant.image} alt={restaurant.name} className="restaurant-image" />
       <p>{restaurant.address}</p>
 
-      {/* Search Bar */}
       <div className="search-bar">
         <input
           type="text"
@@ -113,7 +111,6 @@ function RestaurantMenu() {
             <h4>{item.itemName}</h4>
             <p>₹{item.sizes[item.selectedSize]}</p>
 
-            {/* Dropdown for Size Selection */}
             <div className="dropdown-selector">
               <label htmlFor={`size-${item._id}`}>Size:</label>
               <select
@@ -128,10 +125,9 @@ function RestaurantMenu() {
               </select>
             </div>
 
-            {/* Quantity Selector */}
             <div className="quantity-counter">
               <button
-                disabled={item.quantity <= 0}
+                disabled={!item.quantity || item.quantity <= 0}
                 onClick={() => handleQuantityChange(item._id, -1)}
               >
                 -
@@ -146,10 +142,10 @@ function RestaurantMenu() {
               </button>
             </div>
 
-            {/* Add to Cart Button */}
             <button
               className="add-to-cart"
               onClick={() => handleAddToCart(item)}
+              disabled={!item.quantity || item.quantity <= 0}
             >
               Add to Cart
             </button>

@@ -1,8 +1,32 @@
 import React from "react";
-import "./Cart.css"; // Import the CSS file
+import "./Cart.css";
 
-function Cart({ cartItems, onClose, onPlaceOrder }) {
-  // Calculate the total price of items in the cart
+function Cart({ cartItems, onClose, onPlaceOrder, updateQuantity }) {
+  if (!cartItems || cartItems.length === 0) {
+    return (
+      <div className="cart-overlay">
+        <div className="cart-container">
+          <div className="cart-header">
+            <h2>My Orders</h2>
+            <button className="close-button" onClick={onClose}>X</button>
+          </div>
+          <div className="cart-items">
+            <p>Your cart is empty.</p>
+          </div>
+          <div className="cart-footer">
+            <div className="total">
+              <span>Total:</span>
+              <span>₹0</span>
+            </div>
+            <button className="place-order-button" disabled>
+              Place Order
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -11,57 +35,47 @@ function Cart({ cartItems, onClose, onPlaceOrder }) {
   return (
     <div className="cart-overlay">
       <div className="cart-container">
-        {/* Cart Header */}
         <div className="cart-header">
           <h2>My Orders</h2>
-          {/* Close button triggers the onClose function */}
-          <button
-            className="close-button"
-            onClick={() => {
-              if (typeof onClose === "function") {
-                onClose(); // Execute the onClose function
-              } else {
-                console.error("onClose is not a valid function");
-              }
-            }}
-          >
-            X
-          </button>
+          <h3>{cartItems[0].restaurantName}</h3>
+          <button className="close-button" onClick={onClose}>X</button>
         </div>
 
-        {/* Cart Items */}
         <div className="cart-items">
-          {cartItems.length === 0 ? (
-            <p>Your cart is empty.</p>
-          ) : (
-            cartItems.map((item) => (
-              <div className="cart-item" key={item.id}>
-                <div className="item-info">
-                  <span className="item-name">{item.name}</span>
-                  <span className="item-size"> ({item.size})</span>
-                </div>
-                <div className="item-quantity">
-                  <span>x {item.quantity}</span>
-                </div>
-                <div className="item-price">
-                  <span>₹{item.price * item.quantity}</span>
-                </div>
+          {cartItems.map((item) => (
+            <div className="cart-item" key={`${item.id}-${item.size}`}>
+              <div className="item-info">
+                <span className="item-name">{item.name}</span>
+                <span className="item-size"> ({item.size})</span>
               </div>
-            ))
-          )}
+              <div className="item-quantity">
+                <button 
+                  className="quantity-btn"
+                  onClick={() => updateQuantity(item.id, item.size, -1)}
+                >
+                  -
+                </button>
+                <span>x {item.quantity}</span>
+                <button 
+                  className="quantity-btn"
+                  onClick={() => updateQuantity(item.id, item.size, 1)}
+                >
+                  +
+                </button>
+              </div>
+              <div className="item-price">
+                <span>₹{item.price * item.quantity}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Cart Footer */}
         <div className="cart-footer">
           <div className="total">
             <span>Total:</span>
             <span>₹{totalPrice}</span>
           </div>
-          <button
-            className="place-order-button"
-            onClick={onPlaceOrder}
-            disabled={cartItems.length === 0}
-          >
+          <button className="place-order-button" onClick={onPlaceOrder}>
             Place Order
           </button>
         </div>
@@ -71,4 +85,3 @@ function Cart({ cartItems, onClose, onPlaceOrder }) {
 }
 
 export default Cart;
-
