@@ -38,7 +38,7 @@ const userRoutes = require('./routes/userRoutes');
 
 // Mount routes with appropriate base paths (adjusted order)
 app.use('/api/users', userRoutes); // User routes
-app.use('/api/restaurant', restaurantRoutes); // Restaurant routes
+app.use('/api/restaurants', restaurantRoutes); // Restaurant routes
 app.use('/api/orders', orderRoutes); // Order routes
 app.use('/admin', adminRoutes); // Admin panel routes
 
