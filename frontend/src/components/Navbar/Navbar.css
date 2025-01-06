@@ -1,0 +1,154 @@
+/* Navbar.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Rubik:wght@600&display=swap');
+
+.page-layout {
+  display: flex;
+  font-family: 'Roboto', sans-serif;
+}
+
+.navbar {
+  width: 50px; /* Initial width to show hamburger icon */
+  background-color: #fac744;
+  height: 100vh;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.navbar.open {
+  width: 250px;
+  padding: 20px;
+}
+
+.hamburger-icon {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #333;
+  padding: 10px;
+  align-self: flex-start;
+  position: relative; /* Position absolutely within .navbar */
+  z-index: 101; /* Ensure it's above other navbar content */
+  left: 0; /* Align to the left */
+  top: 0; /* Align to the top */
+}
+
+.navbar.open .hamburger-icon {
+  margin-bottom: 20px; /* Add margin when navbar is open */
+}
+
+.sidebar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center items in the sidebar */
+}
+
+.nav-menu {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  margin-top: 60px;
+}
+
+.nav-item {
+  margin-bottom: 15px;
+  width: 100%; /* Make each item take full width */
+  opacity: 0; /* Initially hide the nav-item */
+  transition: opacity 0.3s ease-in-out; /* Add transition for smooth appearance */
+}
+
+.navbar.open .nav-item {
+  opacity: 1; /* Show the nav-item when navbar is open */
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  padding: 10px;
+  border-radius: 4px;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
+}
+
+.nav-links:hover {
+  background-color: #e6b800;
+}
+
+.nav-links svg {
+  font-size: 1.5rem;
+  margin-right: 10px;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 50px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.content.shifted {
+  margin-left: 250px; /* Adjust position when open */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%; /* Make the header take the full width */
+}
+
+.search-bar-container {
+    display: flex;
+    justify-content: center;
+    margin-left: -60px;
+    flex-grow: 1;
+    padding-left: 0px;
+    width: 50%; /* Make search bar wider */
+    max-width: 700px; /* Limit maximum width of search bar */
+    margin: 0 auto; /* Center the search bar */
+}
+
+.cart-icon {
+  font-size: 2rem;
+  margin-right: 30px;
+}
+
+.cart-icon a {
+  color: #333; /* Adjust icon color */
+  text-decoration: none;
+}
+
+.main-content {
+  padding: 20px; /* Add padding to the main content area */
+  text-align: center; /* Center align the text */
+}
+
+.home-heading, .home-subheading {
+  text-align: center;
+  margin: 0;
+  padding: 10px 0;
+  font-family: 'Rubik', sans-serif; /* Heading font */
+}
+
+.home-heading {
+  font-size: 2em;
+  font-weight: 600; /* Semi-bold weight */
+  color: #333;
+}
+
+.home-subheading {
+  font-size: 1.5em;
+  color: #666;
+}
+.nav-item:last-child {
+    margin-top: auto; /* Push the last item (Logout) to the bottom */
+}

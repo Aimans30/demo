@@ -1,0 +1,114 @@
+.your-orders-container {
+    padding: 20px;
+  }
+  
+  .your-orders-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #e44d26;
+  }
+  
+  .orders-list {
+    display: grid;
+grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.order-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.order-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.order-status {
+    font-size: 0.9em;
+}
+
+.order-status .status {
+    font-weight: bold;
+}
+
+/* Status colors */
+.status.Placed {
+    color: blue;
+}
+
+.status.Accepted {
+    color: green;
+}
+
+.status.Preparing {
+    color: orange;
+}
+
+.status.Ready {
+    color: rgb(184, 184, 46);
+}
+
+.status.Out-for-Delivery {
+    color: rgb(208, 208, 87);
+}
+
+.status.Delivered {
+    color: green;
+}
+
+.status.Cancelled {
+    color: red;
+}
+
+.order-body {
+    margin-bottom: 10px;
+}
+
+.order-body p {
+    margin: 5px 0;
+}
+
+.order-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.order-body li {
+    margin-bottom: 5px;
+}
+
+.order-total {
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+.order-total b {
+    font-weight: bold;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .orders-list {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Smaller cards on mobile */
+    }
+
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-status {
+        margin-top: 5px;
+    }
+}
