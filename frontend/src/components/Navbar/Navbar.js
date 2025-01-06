@@ -101,7 +101,6 @@ function Navbar({ isLoggedIn, userRole, onLogout }) {
           </div>
           <div className="main-content">
             <h1 className="home-heading">Your Local go to..</h1>
-            <h2 className="home-subheading">Top Rated</h2>
           </div>
         </div>
       )}

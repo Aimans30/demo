@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import SearchBar from '../SearchBar/SearchBar'; // Import SearchBar
-import './RestaurantMenu.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import SearchBar from "../SearchBar/SearchBar";
+import "./RestaurantMenu.css";
 
-function RestaurantMenu() {
+function RestaurantMenu({ addToCart }) {
   const [restaurant, setRestaurant] = useState(null);
   const [filteredMenu, setFilteredMenu] = useState([]);
   const { id } = useParams();
-  const [cart, setCart] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false);
 
   useEffect(() => {
@@ -16,7 +15,7 @@ function RestaurantMenu() {
       try {
         const response = await axios.get(`/api/restaurants/${id}`);
         setRestaurant(response.data);
-        setFilteredMenu(response.data.menu || []); // Initialize filteredMenu
+        setFilteredMenu(response.data.menu || []);
       } catch (error) {
         console.error(error);
       }
@@ -24,14 +23,6 @@ function RestaurantMenu() {
 
     fetchRestaurant();
   }, [id]);
-
-  useEffect(() => {
-    // Load cart from local storage on component mount
-    const storedCart = localStorage.getItem('cartItems');
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
-    }
-  }, []);
 
   const handleSizeChange = (itemId, size) => {
     setRestaurant((prevState) => ({
@@ -67,24 +58,20 @@ function RestaurantMenu() {
   const handleAddToCart = (item) => {
     if (item.selectedSize) {
       const itemToCart = {
+        ...item,
         id: item._id,
-        name: item.name, // Ensure 'name' is used instead of 'itemName'
-        price: item.sizes[item.selectedSize],
+        restaurantId: id,
         quantity: item.quantity || 1,
         size: item.selectedSize,
+        price: item.sizes[item.selectedSize],
       };
-  
-      setCart((prevCart) => {
-        const updatedCart = [...prevCart, itemToCart];
-        localStorage.setItem('cartItems', JSON.stringify(updatedCart));
-        return updatedCart;
-      });
-  
-      // Show popup
+
+      addToCart(itemToCart);
+
       setPopupVisible(true);
       setTimeout(() => setPopupVisible(false), 3000);
     } else {
-      alert('Please select a size before adding to cart.');
+      alert("Please select a size before adding to cart.");
     }
   };
 
@@ -108,21 +95,22 @@ function RestaurantMenu() {
   return (
     <div className="restaurant-menu-page">
       <h2>{restaurant.name}</h2>
-      <img src={restaurant.image} alt={restaurant.name} className="restaurant-image" />
+      <img
+        src={restaurant.image}
+        alt={restaurant.name}
+        className="restaurant-image"
+      />
       <p>{restaurant.address}</p>
 
-      {/* Search Bar */}
       <SearchBar restaurantId={id} onSearch={handleSearch} />
 
       <h3>Menu:</h3>
       <div className="menu-list">
         {filteredMenu.map((item) => (
           <div key={item._id} className="menu-card">
-            {/* Ensure the 'name' property is used */}
             <h4>{item.name}</h4>
             <p>₹{item.sizes[item.selectedSize]}</p>
 
-            {/* Dropdown for Size Selection */}
             <div className="dropdown-selector">
               <label htmlFor={`size-${item._id}`}>Size:</label>
               <select
@@ -139,16 +127,19 @@ function RestaurantMenu() {
               </select>
             </div>
 
-            {/* Quantity Selector */}
             <div className="quantity-counter">
-              <button disabled={item.quantity <= 0} onClick={() => handleQuantityChange(item._id, -1)}>
+              <button
+                disabled={item.quantity <= 0}
+                onClick={() => handleQuantityChange(item._id, -1)}
+              >
                 -
               </button>
               <input type="text" value={item.quantity || 0} readOnly />
-              <button onClick={() => handleQuantityChange(item._id, 1)}>+</button>
+              <button onClick={() => handleQuantityChange(item._id, 1)}>
+                +
+              </button>
             </div>
 
-            {/* Add to Cart Button */}
             <button className="add-to-cart" onClick={() => handleAddToCart(item)}>
               Add to Cart
             </button>
