@@ -141,7 +141,7 @@ function RestaurantMenu({ addToCart }) {
                 +
               </button>
             </div>
-
+            <div class="add-to-cart-container">
             <button
               className="add-to-cart"
               onClick={() => handleAddToCart(item)}
@@ -149,6 +149,7 @@ function RestaurantMenu({ addToCart }) {
             >
               Add to Cart
             </button>
+            </div>
           </div>
         ))}
       </div>

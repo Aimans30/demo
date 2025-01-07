@@ -1,4 +1,6 @@
 /* RestaurantMenu.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ravens&display=swap');
 
 .restaurant-menu-page {
   padding: 50px;
@@ -45,6 +47,7 @@
 }
 
 .menu-card h4 {
+  font-family: 'Ravens', sans-serif; /* Apply the Ravens font */
   margin-bottom: 8px;
   color: #333;
   font-size: 1.2rem;
@@ -61,36 +64,52 @@
 }
 
 .dropdown-selector select {
+  font-family: 'Montserrat', sans-serif; /* Use Montserrat font */
   width: 100%;
   padding: 8px;
   font-size: 14px;
+  border: none;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   outline: none;
+  cursor: pointer;
   background-color: #fff;
   transition: border-color 0.3s ease;
+  
 }
 
 .dropdown-selector select:focus {
+    outline: none;
+
   border-color: #007bff;
 }
 
 .quantity-counter {
+  font-family: 'Montserrat', sans-serif; /* Use Montserrat font */
   display: flex;
   align-items: center;
   gap: 10px;
   justify-content: center;
-  margin-top: 10px;
+  font-size: 1rem; /* Adjust font size */
+  font-weight: 800;
+  margin-top: 5px;
 }
 
 .quantity-counter button {
+  font-family: 'Montserrat', sans-serif; /* Use Montserrat font */
+  cursor: pointer;
   background-color: #fac744;
   color: #333;
   border: none;
   padding: 5px 15px;
   cursor: pointer;
+  display: flex;
+  font-size: 1rem; /* Adjust font size */
+  font-weight: 800;
   border-radius: 4px;
   font-size: 0.9rem;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.3s ease;
 }
 
@@ -107,25 +126,59 @@
   cursor: not-allowed;
 }
 
+.quantity-counter button:active {
+  transform: translateY(4px); /* Button moves down slightly when clicked */
+  box-shadow: none;
+}
+
 .quantity-counter button:hover:not(:disabled) {
   background-color: #e6b800;
 }
-
-.add-to-cart {
-  margin-top: 15px;
-  background-color: #fac744;
-  color: #333;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 0.9rem;
+.quantity-counter span {
+  font-family: 'Montserrat', sans-serif; /* Match font with buttons */
+  font-size: 1rem; /* Adjust font size */
   font-weight: bold;
-  transition: background-color 0.3s ease;
+  text-align: center;
+  min-width: 30px; /* Ensures the number doesn't disappear */
+}
+.add-to-cart-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically if needed */
+  margin: 20px 0; /* Optional: Add some spacing around the button */
+}
+.add-to-cart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 40px; /* Increased padding for width */
+  gap: 15px;
+  background-color: #fac744; /* Yellow background */
+  outline: 3px #fac744 solid;
+  outline-offset: -3px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: 400ms;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1em;
+  color: black; /* Black text */
+}
+
+.add-to-cart .text {
+  color: black; /* Black text initially */
+  font-weight: 700;
+  font-size: 1em;
+  transition: 400ms;
 }
 
 .add-to-cart:hover {
-  background-color: #e6b800;
+  background-color: transparent;
+}
+
+.add-to-cart:hover .text {
+  color: #fac744; /* Yellow text on hover */
 }
 
 .popup {
@@ -160,15 +213,32 @@
   align-items: center;
   gap: 10px;
 }
-
 .search-bar input {
-  width: 300px; /* Increased search bar width */
-  padding: 10px;
+  border: none;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #e8e8e8;
+  box-shadow: 20px 20px 60px #c5c5c5, -20px -20px 60px #ffffff;
+  transition: 0.3s;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  outline: none;
+  width: 300px; /* Adjust width as needed */
+  outline: none; /* Remove default outline */
 }
+
+.search-bar input:focus {
+  outline: none;
+  background: #e8e8e8;
+  box-shadow: inset 20px 20px 60px #c5c5c5, inset -20px -20px 60px #ffffff;
+  transition: 0.3s;
+}
+
+.search-bar {
+  display: flex;
+  justify-content: center; /* Center the search bar */
+  align-items: center;
+  margin-bottom: 30px;
+}
+
 
 .search-bar input::placeholder {
   color: #aaa;

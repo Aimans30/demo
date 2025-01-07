@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./YourOrders.css"; // Optional: Add styles for this page if needed
+import "./YourOrders.css";
 
 const YourOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -7,15 +7,14 @@ const YourOrders = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch orders from your backend API
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders"); // Replace with your API endpoint
+        const response = await fetch("/api/orders");
         if (!response.ok) {
           throw new Error("Failed to fetch orders");
         }
         const data = await response.json();
-        setOrders(data.orders); // Update this according to your API response structure
+        setOrders(data.orders);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -36,19 +35,39 @@ const YourOrders = () => {
 
   return (
     <div className="your-orders-container">
-      <h1>Your Orders</h1>
+      <h1 className="your-orders-header">Your Orders</h1>
       {orders.length === 0 ? (
-        <p>No orders found.</p>
+        <p className="no-orders">No orders found.</p>
       ) : (
         <ul className="your-orders-list">
           {orders.map((order) => (
             <li key={order._id} className="your-order-item">
-              <div className="order-details">
-                <p><strong>Order ID:</strong> {order._id}</p>
-                <p><strong>Restaurant:</strong> {order.restaurant}</p>
-                <p><strong>Total Amount:</strong> ${order.totalAmount}</p>
-                <p><strong>Status:</strong> {order.status}</p>
-                <p><strong>Ordered At:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+              <div className="order-body">
+                <p>
+                  <b>Restaurant:</b> {order.restaurant?.name || "N/A"}
+                </p>
+                <p>
+                  <b>Ordered At:</b>{" "}
+                  {order.createdAt
+                    ? new Date(order.createdAt).toLocaleString()
+                    : "N/A"}
+                </p>
+                <p className="order-total">
+                  <b>Total Amount:</b> ${order.totalAmount?.toFixed(2) || "0.00"}
+                </p>
+                <p className="order-status">
+                  <b>Status:</b> {order.status || "Unknown"}
+                </p>
+                <div className="order-items">
+                  <b> Items:</b>
+                  <ul>
+                    {order.items?.map((item, index) => (
+                      <li key={index}>
+                        {item.name} - {item.quantity}x
+                      </li>
+                    )) || <li>No items available</li>}
+                  </ul>
+                </div>
               </div>
             </li>
           ))}

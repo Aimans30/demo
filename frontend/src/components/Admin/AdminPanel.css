@@ -1,63 +1,338 @@
-/* AdminPanel.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f1f3f6;
+}
 
-.admin-panel {
-    padding: 20px;
-    background-color: #f8f9fa;
-    min-height: 100vh;
-  }
-  
+.admin-panel-container {
+  max-width: 1100px;
+  margin: 30px auto;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 20px;
+  margin-left: 60px; /* Ensure content starts after the navbar */
+}
+
+.admin-panel h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #343a40;
+  font-size: 1.8rem;
+}
+
+.admin-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  table-layout: fixed; /* Enable fixed-width columns */
+}
+
+.admin-panel th,
+.admin-panel td {
+  border: 1px solid #dee2e6;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  word-wrap: break-word; /* Handle text overflow */
+}
+
+.admin-panel th {
+  background-color: #007bff;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.admin-panel tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.admin-panel tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Adjusting column widths */
+.admin-panel th:nth-child(1),
+.admin-panel td:nth-child(1) {
+  width: 15%; /* Name column */
+}
+
+.admin-panel th:nth-child(2),
+.admin-panel td:nth-child(2) {
+  width: 15%; /* Mobile Number column */
+}
+
+.admin-panel th:nth-child(3),
+.admin-panel td:nth-child(3) {
+  width: 10%; /* Current Role column */
+}
+
+.admin-panel th:nth-child(4),
+.admin-panel td:nth-child(4) {
+  width: 30%; /* Actions column */
+}
+
+.admin-panel select,
+.admin-panel button {
+  margin: 5px 0;
+  padding: 8px;
+  font-size: 0.9rem;
+  width: auto; /* Adjust width for smaller buttons */
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.admin-panel button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-panel button:hover {
+  background-color: #0056b3;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Keep Navbar Fixed and Content Visible */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 60px; /* Set the width of the navbar */
+  height: 100%;
+  background-color: #ffc107; /* Same as your navbar's color */
+  z-index: 1000;
+}
+
+/* Center-align the table container */
+.admin-panel-container {
+  margin: 30px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-left: 0; /* No additional shift for the table content */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .admin-panel h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
+    font-size: 1.5rem;
   }
-  
-  .admin-panel table {
-    width: 100%;
-    border-collapse: collapse;
+
+  .admin-panel-container {
+    padding: 15px;
+    margin-left: 60px; /* Ensure space for the navbar on smaller screens */
   }
-  
-  .admin-panel th, .admin-panel td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+
+  .admin-panel table th,
+  .admin-panel table td {
+    font-size: 0.85rem;
   }
-  
-  .admin-panel th {
-    background-color: #007bff;
-    color: white;
+
+  .admin-panel th:nth-child(1),
+  .admin-panel td:nth-child(1) {
+    width: 30%; /* Adjust Name column width on smaller screens */
   }
-  
-  .admin-panel tr:nth-child(even) {
-    background-color: #f2f2f2;
+
+  .admin-panel th:nth-child(4),
+  .admin-panel td:nth-child(4) {
+    width: 40%; /* Adjust Actions column width on smaller screens */
   }
-  
-  .admin-panel tr:hover {
-    background-color: #e9ecef;
-  }
-  
-  .admin-panel select, .admin-panel button {
-    margin: 5px 0;
-    padding: 5px;
-  }
-  
+}
+/* Assign Role Button Styling */
+.admin-panel button {
+  background-color: #3DD1E7;
+  border: 0 solid #E5E7EB;
+  box-sizing: border-box;
+  color: #000000;
+  display: flex;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1.75rem;
+  padding: 0.75rem 1.65rem;
+  align-items: center; /* Ensure text inside is centered */
+  max-width: 210px; /* Reduced width */
+  width: 100%; /* Full width by default */
+  position: relative;
+  cursor: pointer;
+  transform: rotate(-2deg);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin: 0 auto; /* Center-aligns the button */
+
+}
+
+.admin-panel button:focus {
+  outline: none;
+}
+
+.admin-panel button:after {
+  content: '';
+  position: absolute;
+  border: 1px solid #000000;
+  bottom: 4px;
+  left: 4px;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+}
+
+.admin-panel button:hover:after {
+  bottom: 2px;
+  left: 2px;
+}
+
+@media (min-width: 768px) {
   .admin-panel button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+    padding: 0.75rem 3rem;
+    font-size: 1.25rem;
   }
-  
-  .admin-panel button:hover {
-    background-color: #0056b3;
-  }
-  
-  .admin-panel input[type="text"] {
-    padding: 5px;
-    width: 100%;
-  }
-  
-  .error-message {
-    color: red;
-    font-weight: bold;
+}
+
+/* Assign Role Dropdown */
+.role-select {
+  width: 200px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2029;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.role-select:focus {
+  outline: none;
+  border-color: #48dbfb;
+  box-shadow: 0 0 8px rgba(72, 219, 251, 0.8);
+}
+
+.role-select:hover {
+  border-color: #48dbfb;
+  background-color: #fff;
+}
+
+/* Assign Role Button */
+.assign-role-btn {
+  margin-top: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #48dbfb;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.assign-role-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.assign-role-btn:hover:not(:disabled) {
+  background-color: #0077b6;
+}
+
+/* Restaurant Dropdown */
+.restaurant-select {
+  width: 200px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2029;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.restaurant-select:focus {
+  outline: none;
+  border-color: #48dbfb;
+  box-shadow: 0 0 8px rgba(72, 219, 251, 0.8);
+}
+
+.restaurant-select:hover {
+  border-color: #48dbfb;
+  background-color: #fff;
+}
+
+/* Table Styling for Better Layout */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background-color: #1f2029;
+  color: #fff;
+  font-size: 16px;
+}
+
+td {
+  background-color: #f9f9f9;
+  font-size: 14px;
+  color: #333;
+}
+
+tr:nth-child(even) td {
+  background-color: #f1f1f1;
+}
+
+tr:hover td {
+  background-color: #eaf4ff;
+}
+
+/* Success and Error Messages */
+.success-message {
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+}
+
+.error-message {
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+}
+
+/* Loading Spinner */
+.loading {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
 }

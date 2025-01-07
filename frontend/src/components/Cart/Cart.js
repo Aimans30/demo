@@ -49,19 +49,21 @@ function Cart({ cartItems, onClose, onPlaceOrder, updateQuantity }) {
                 <span className="item-size"> ({item.size})</span>
               </div>
               <div className="item-quantity">
-                <button 
-                  className="quantity-btn"
-                  onClick={() => updateQuantity(item.id, item.size, -1)}
-                >
-                  -
-                </button>
+              <button 
+  className="quantity-btn" 
+  aria-label="Decrease quantity"
+  onClick={() => updateQuantity(item.id, item.size, -1)}
+>
+  -
+</button>
                 <span>x {item.quantity}</span>
                 <button 
-                  className="quantity-btn"
-                  onClick={() => updateQuantity(item.id, item.size, 1)}
-                >
-                  +
-                </button>
+  className="quantity-btn" 
+  aria-label="Increase quantity"
+  onClick={() => updateQuantity(item.id, item.size, 1)}
+>
+  +
+</button>
               </div>
               <div className="item-price">
                 <span>₹{item.price * item.quantity}</span>

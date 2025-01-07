@@ -1,23 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&family=Rubik:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 /* General Page Layout */
 .page-layout {
   display: flex;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Navbar Styles */
 .navbar {
-  width: 50px; /* Initial width to show hamburger icon */
+  width: 50px; /* Initial width for desktop */
   background-color: #fac744;
   height: 100vh;
   position: fixed;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+  transition: width 0.5s ease-in-out, padding 0.5s ease-in-out;
   overflow: hidden;
   z-index: 100;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .navbar.open {
@@ -28,18 +29,23 @@
 /* Hamburger Icon */
 .hamburger-icon {
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #333;
   padding: 10px;
   align-self: flex-start;
   position: relative;
-  z-index: 101; /* Ensure it's above other navbar content */
-  left: 0; /* Align to the left */
-  top: 0; /* Align to the top */
+  z-index: 101;
+  left: 0;
+  top: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.hamburger-icon:hover {
+  transform: rotate(90deg);
 }
 
 .navbar.open .hamburger-icon {
-  margin-bottom: 20px; /* Add margin when navbar is open */
+  margin-bottom: 20px;
 }
 
 /* Sidebar Styles */
@@ -47,7 +53,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center items in the sidebar */
+  align-items: center;
 }
 
 .nav-menu {
@@ -59,15 +65,15 @@
 
 .nav-item {
   margin-bottom: 15px;
-  width: 100%; /* Make each item take full width */
-  opacity: 0; /* Initially hide the nav-item */
-  visibility: hidden; /* Ensure text is not visible */
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition for appearance */
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
 .navbar.open .nav-item {
-  opacity: 1; /* Show the nav-item when navbar is open */
-  visibility: visible; /* Make text visible */
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Navbar Links */
@@ -80,10 +86,13 @@
   border-radius: 4px;
   width: calc(100% - 20px);
   box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
 }
 
 .nav-links:hover {
   background-color: #e6b800;
+  transform: scale(1.05);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .nav-links svg {
@@ -93,7 +102,7 @@
 
 /* Logout button pushed to the bottom */
 .nav-item:last-child {
-  margin-top: auto; /* Push the last item (Logout) to the bottom */
+  margin-top: auto;
 }
 
 /* Content Styles */
@@ -103,11 +112,11 @@
   display: flex;
   flex-direction: column;
   margin-left: 50px;
-  transition: margin-left 0.3s ease-in-out;
+  transition: margin-left 0.5s ease-in-out;
 }
 
 .content.shifted {
-  margin-left: 250px; /* Adjust position when navbar is open */
+  margin-left: 250px;
 }
 
 /* Header Styles */
@@ -116,32 +125,29 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  width: 100%; /* Make the header take the full width */
+  width: 100%;
 }
 
-.search-bar-container {
-  display: flex;
-  justify-content: center;
-  flex-grow: 1;
-  width: 50%; /* Make search bar wider */
-  max-width: 700px; /* Limit maximum width of search bar */
-  margin: 0 auto; /* Center the search bar */
-}
-
+/* Cart Icon */
 .cart-icon {
   font-size: 2rem;
+  color: #333; /* Ensures visibility */
   margin-right: 30px;
 }
 
 .cart-icon a {
-  color: #333; /* Adjust icon color */
   text-decoration: none;
+  color: inherit;
+}
+
+.cart-icon svg {
+  vertical-align: middle; /* Fixes alignment issues */
 }
 
 /* Main Content Styles */
 .main-content {
-  padding: 20px; /* Add padding to the main content area */
-  text-align: center; /* Center align the text */
+  padding: 20px;
+  text-align: center;
 }
 
 .home-heading,
@@ -149,12 +155,12 @@
   text-align: center;
   margin: 0;
   padding: 10px 0;
-  font-family: 'Rubik', sans-serif; /* Heading font */
+  font-family: 'Poppins', sans-serif;
 }
 
 .home-heading {
   font-size: 2em;
-  font-weight: 600; /* Semi-bold weight */
+  font-weight: 600;
   color: #333;
 }
 
@@ -188,8 +194,56 @@
   border: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
 }
 
 .search-button:hover {
   background-color: #555;
+}
+
+/* Smooth Hover Effects */
+.nav-links:hover {
+  background-color: #e6b800;
+  transform: scale(1.05);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth Transition for Navbar Open/Close */
+.navbar,
+.content {
+  transition: all 0.5s ease-in-out;
+}
+
+/* Responsive Design for Phones */
+@media (max-width: 768px) {
+  .navbar {
+    height: 50px; /* Adjust navbar height */
+    width: 100%; /* Full width on top */
+    flex-direction: row;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .navbar.open {
+    height: auto; /* Expand height for menu items */
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .sidebar {
+    flex-direction: row; /* Align items in a row for smaller screens */
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .content {
+    margin-top: 50px; /* Push content down to avoid overlapping navbar */
+    margin-left: 0; /* Reset left margin */
+  }
+
+  .content.shifted {
+    margin-top: 150px; /* Adjust top margin when expanded */
+  }
 }

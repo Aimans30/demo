@@ -36,32 +36,49 @@
   margin: 0;
   color: #333;
   font-size: 18px;
+  font-weight: normal;
 }
 
 .cart-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   margin-bottom: 15px;
+  position: relative;
 }
 
 .cart-header h2 {
-  font-size: 22px;
+  font-size: 24px;
   color: black;
+  margin: 0;
+  font-weight: bold;
 }
 
 .close-button {
-  background-color: #3b86fc;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #6225e6;
   color: white;
   font-size: 18px;
+  font-weight: bold;
   border: none;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 black;
   padding: 5px 10px;
-  border-radius: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .close-button:hover {
-  background-color: #2368d6;
+  background: #8151f0;
+  box-shadow: 4px 4px 0 #fbc638;
+  transform: scale(1.1);
+}
+
+.close-button:focus {
+  outline: none;
 }
 
 .cart-items {
@@ -98,7 +115,47 @@
 }
 
 .item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 16px;
+  font-family: 'Arial', sans-serif; /* Updated font for quantity */
+}
+
+.quantity-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  background: #6225e6;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 3px 3px 0 black;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: skewX(-15deg);
+}
+
+.quantity-button:hover {
+  background: #8151f0;
+  box-shadow: 5px 5px 0 #fbc638;
+  transform: skewX(-15deg) scale(1.1);
+}
+
+.quantity-button:focus {
+  outline: none;
+}
+
+.quantity-button:disabled {
+  background-color: #d3d3d3;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .item-price {
@@ -121,24 +178,51 @@
 }
 
 .place-order-button {
-  background-color: white;
-  color: black;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 33px;
+  font-size: 18px;
+  color: white;
+  background: #6225e6;
+  transition: 1s;
+  box-shadow: 6px 6px 0 black;
+  transform: skewX(-15deg);
   border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease;
+  text-align: center;
 }
 
 .place-order-button:hover {
-  background-color: #ffe18a;
+  transition: 0.5s;
+  box-shadow: 10px 10px 0 #fbc638;
+  background: #8151f0;
 }
 
 .place-order-button:disabled {
   background-color: #d3d3d3;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.place-order-button:focus {
+  outline: none;
+}
+
+.place-order-button .span {
+  transform: skewX(15deg);
+}
+
+.place-order-button .second {
+  width: 20px;
+  margin-left: 30px;
+  position: relative;
+  top: 12%;
+}
+
+.place-order-button:hover .second {
+  margin-right: 45px;
 }
 
 @media (max-width: 768px) {
@@ -146,12 +230,63 @@
     width: 100%;
   }
 
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .place-order-button {
     width: 100%;
   }
+
+  .cart-header h2 {
+    font-size: 18px;
+  }
+
+  .close-button {
+    top: 5px;
+    right: 5px;
+    padding: 3px 8px;
+    font-size: 14px;
+  }
+
+  .quantity-button {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .cart-item {
+    padding: 8px;
+  }
+
+  .item-info .item-name {
+    font-size: 14px;
+  }
+
+  .item-info .item-size {
+    font-size: 12px;
+  }
+}
+
+.quantity-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Reduced width for a smaller size */
+  height: 30px; /* Same height as width to make it square */
+  background: #6225e6;
+  color: white;
+  font-size: 16px; /* Slightly smaller font */
+  font-weight: bold;
+  border: none;
+  border-radius: 4px; /* Slight rounding for a modern square design */
+  box-shadow: 2px 2px 0 black;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+  background: #8151f0;
+  box-shadow: 4px 4px 0 #fbc638;
+  transform: scale(1.1);
+}
+
+.quantity-btn:focus {
+  outline: none; /* Removes the default blue outline */
 }
