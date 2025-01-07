@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './RestaurantPanel.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./RestaurantPanel.css";
 
 const RestaurantPanel = () => {
   const [orders, setOrders] = useState([]);
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [view, setView] = useState('orders');
-  const [orderFilter, setOrderFilter] = useState('all');
+  const [error, setError] = useState("");
+  const [view, setView] = useState("orders");
+  const [orderFilter, setOrderFilter] = useState("all");
   const [showAddItemForm, setShowAddItemForm] = useState(false);
   const [showEditItemForm, setShowEditItemForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const [newItem, setNewItem] = useState({
-    name: '',
-    category: '',
+    name: "",
+    category: "",
     sizes: {},
   });
 
   const [editItemData, setEditItemData] = useState({
-    name: '',
-    category: '',
+    name: "",
+    category: "",
     sizes: {},
   });
 
@@ -29,12 +29,12 @@ const RestaurantPanel = () => {
     const fetchOrdersAndMenu = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const [ordersResponse, menuResponse] = await Promise.all([
-          axios.get('/api/restaurant/orders', {
+          axios.get("/api/restaurant/orders", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get('/api/restaurant/menu', {
+          axios.get("/api/restaurant/menu", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -45,22 +45,22 @@ const RestaurantPanel = () => {
           );
           setOrders(sortedOrders);
         } else {
-          setError('Invalid orders data format received from server');
+          setError("Invalid orders data format received from server");
         }
 
         if (menuResponse.data && Array.isArray(menuResponse.data)) {
           setMenu(menuResponse.data);
         } else {
-          setError('Invalid menu data format received from server');
+          setError("Invalid menu data format received from server");
         }
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch data.');
+        setError(err.response?.data?.message || "Failed to fetch data.");
       } finally {
         setLoading(false);
       }
     };
 
-    if (localStorage.getItem('userRole') === 'restaurant') {
+    if (localStorage.getItem("userRole") === "restaurant") {
       fetchOrdersAndMenu();
       const intervalId = setInterval(fetchOrdersAndMenu, 30000);
       return () => clearInterval(intervalId);
@@ -69,59 +69,89 @@ const RestaurantPanel = () => {
 
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.patch(
         `/api/restaurant/orders/${orderId}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setOrders(orders.map(order =>
+      setOrders(orders.map((order) =>
         order._id === orderId ? { ...order, orderStatus: newStatus } : order
       ));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update order status.');
+      alert(err.response?.data?.message || "Failed to update order status.");
     }
   };
 
   const handleAddItem = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('/api/restaurant/menu', newItem, {
+      const token = localStorage.getItem("token");
+      const response = await axios.post("/api/restaurant/menu", newItem, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setMenu([...menu, response.data]);
-      setNewItem({ name: '', category: '', sizes: {} });
+      setNewItem({ name: "", category: "", sizes: {} });
       setShowAddItemForm(false);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add menu item.');
+      alert(err.response?.data?.message || "Failed to add menu item.");
     }
   };
 
   const handleEditItem = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await axios.patch(
         `/api/restaurant/menu/${selectedItem._id}`,
         editItemData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setMenu(menu.map(item => item._id === selectedItem._id ? response.data : item));
+      setMenu(menu.map((item) =>
+        item._id === selectedItem._id ? response.data : item
+      ));
       setShowEditItemForm(false);
       setSelectedItem(null);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to edit menu item.');
+      alert(err.response?.data?.message || "Failed to edit menu item.");
     }
   };
+
+  const getStatusAction = (status) => {
+    switch (status) {
+      case "Pending":
+        return "Approve";
+      case "Approved":
+        return "Out for Delivery";
+      case "Out for Delivery":
+        return "Delivered";
+      default:
+        return null;
+    }
+  };
+
+  const filteredOrders = orders.filter((order) => {
+    if (orderFilter === "all") return true;
+    return order.status === orderFilter;
+  });
 
   return (
     <div className="restaurant-panel">
       <h1>Restaurant Panel</h1>
       <div className="toggle-buttons">
-        <button onClick={() => setView('orders')} className={view === 'orders' ? 'active' : ''}>View Orders</button>
-        <button onClick={() => setView('menu')} className={view === 'menu' ? 'active' : ''}>Edit Menu</button>
+        <button
+          onClick={() => setView("orders")}
+          className={view === "orders" ? "active" : ""}
+        >
+          View Orders
+        </button>
+        <button
+          onClick={() => setView("menu")}
+          className={view === "menu" ? "active" : ""}
+        >
+          Edit Menu
+        </button>
       </div>
 
       {loading ? (
@@ -130,29 +160,99 @@ const RestaurantPanel = () => {
         <div className="error">{error}</div>
       ) : (
         <>
-          {view === 'orders' && (
+          {view === "orders" && (
             <div>
               <h2>Orders</h2>
+              <div className="filter-buttons">
+                <button
+                  onClick={() => setOrderFilter("all")}
+                  className={orderFilter === "all" ? "active" : ""}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setOrderFilter("Pending")}
+                  className={orderFilter === "Pending" ? "active" : ""}
+                >
+                  Pending
+                </button>
+                <button
+                  onClick={() => setOrderFilter("Approved")}
+                  className={orderFilter === "Approved" ? "active" : ""}
+                >
+                  Approved
+                </button>
+                <button
+                  onClick={() => setOrderFilter("Out for Delivery")}
+                  className={orderFilter === "Out for Delivery" ? "active" : ""}
+                >
+                  Out for Delivery
+                </button>
+                <button
+                  onClick={() => setOrderFilter("Delivered")}
+                  className={orderFilter === "Delivered" ? "active" : ""}
+                >
+                  Delivered
+                </button>
+                <button
+                  onClick={() => setOrderFilter("Declined")}
+                  className={orderFilter === "Declined" ? "active" : ""}
+                >
+                  Declined
+                </button>
+              </div>
               <table>
                 <thead>
                   <tr>
                     <th>Order ID</th>
                     <th>Customer</th>
+                    <th>Address</th>
                     <th>Total</th>
                     <th>Status</th>
+                    <th>Items</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map(order => (
+                  {filteredOrders.map((order) => (
                     <tr key={order._id}>
                       <td>{order._id}</td>
-                      <td>{order.customer.username}</td>
-                      <td>₹{order.totalAmount}</td>
-                      <td>{order.orderStatus}</td>
                       <td>
-                        {order.orderStatus === 'Placed' && (
-                          <button onClick={() => handleOrderStatusUpdate(order._id, 'Accepted')}>Accept</button>
+                        {order.status !== "Pending"
+                          ? `${order.customer.username} (${order.customer.phoneNumber})`
+                          : "---"}
+                      </td>
+                      <td>{order.address}</td>
+                      <td>₹{order.totalAmount}</td>
+                      <td>{order.status}</td>
+                      <td>
+                        <ul>
+                          {order.items.map((item) => (
+                            <li key={item.menuItem._id}>
+                              {item.menuItem.name} (Qty: {item.quantity})
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td>
+                        {["Pending", "Approved", "Out for Delivery"].includes(order.status) && (
+                          <button
+                            onClick={() =>
+                              handleOrderStatusUpdate(order._id, getStatusAction(order.status))
+                            }
+                          >
+                            {getStatusAction(order.status)}
+                          </button>
+                        )}
+                        {order.status === "Pending" && (
+                          <button
+                            onClick={() =>
+                              handleOrderStatusUpdate(order._id, "Declined")
+                            }
+                            className="decline"
+                          >
+                            Decline
+                          </button>
                         )}
                       </td>
                     </tr>
@@ -162,12 +262,14 @@ const RestaurantPanel = () => {
             </div>
           )}
 
-          {view === 'menu' && (
+          {view === "menu" && (
             <div>
               <h2>Menu</h2>
               <button onClick={() => setShowAddItemForm(true)}>Add Item</button>
-              {menu.map(item => (
-                <div key={item._id}>{item.name}</div>
+              {menu.map((item) => (
+                <div key={item._id}>
+                  {item.name}
+                </div>
               ))}
             </div>
           )}

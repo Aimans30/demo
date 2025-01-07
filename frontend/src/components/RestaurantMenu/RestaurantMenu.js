@@ -5,15 +5,18 @@ import './RestaurantMenu.css';
 
 function RestaurantMenu({ addToCart }) {
   const [restaurant, setRestaurant] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [selectedSize, setSelectedSize] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const { id } = useParams();
   const [popupVisible, setPopupVisible] = useState(false);
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/restaurants/${id}`);
         setRestaurant(response.data);
+        setMenuItems(response.data.menu);
       } catch (error) {
         console.error(error);
       }
@@ -23,65 +26,58 @@ function RestaurantMenu({ addToCart }) {
   }, [id]);
 
   const handleSizeChange = (itemId, size) => {
-    setRestaurant(prevState => ({
-      ...prevState,
-      menu: prevState.menu.map(menuItem => {
-        if (menuItem._id === itemId) {
-          return {
-            ...menuItem,
-            selectedSize: size,
-          };
-        }
-        return menuItem;
-      }),
+    setMenuItems(prevState => prevState.map(menuItem => {
+      if (menuItem._id === itemId) {
+        return {
+          ...menuItem,
+          selectedSize: size,
+        };
+      }
+      return menuItem;
     }));
   };
 
   const handleQuantityChange = (itemId, increment) => {
-    setRestaurant(prevState => ({
-      ...prevState,
-      menu: prevState.menu.map(menuItem => {
-        if (menuItem._id === itemId) {
-          const newQuantity = (menuItem.quantity || 0) + increment;
-          return {
-            ...menuItem,
-            quantity: Math.max(newQuantity, 0),
-          };
-        }
-        return menuItem;
-      }),
+    setMenuItems(prevState => prevState.map(menuItem => {
+      if (menuItem._id === itemId) {
+        const newQuantity = (menuItem.quantity || 0) + increment;
+        return {
+          ...menuItem,
+          quantity: Math.max(newQuantity, 0),
+        };
+      }
+      return menuItem;
     }));
   };
 
   const handleAddToCart = (item) => {
-    if (item.selectedSize) {
-      const itemToCart = {
-        id: item._id,
-        name: item.itemName,
-        price: item.sizes[item.selectedSize],
-        quantity: item.quantity || 1,
-        size: item.selectedSize,
-        restaurantId: id,
-        restaurantName: restaurant.name
-      };
-
-      addToCart(itemToCart);
-      
-      // Reset quantity after adding to cart
-      handleQuantityChange(item._id, -item.quantity);
-      
-      setPopupVisible(true);
-      setTimeout(() => setPopupVisible(false), 3000);
-    } else {
+    if (!item.selectedSize) {
       alert('Please select a size before adding to cart.');
+      return;
     }
+
+    const price = item.sizes[item.selectedSize];
+
+    addToCart({
+      id: item._id,
+      name: item.itemName,
+      price: price,
+      quantity: item.quantity || 1,
+      size: item.selectedSize,
+      restaurantId: id,
+      restaurantName: restaurant.name,
+    });
+
+    handleQuantityChange(item._id, -item.quantity);
+    setPopupVisible(true);
+    setTimeout(() => setPopupVisible(false), 3000);
   };
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  const filteredMenu = restaurant ? restaurant.menu.filter(item =>
+  const filteredMenu = restaurant ? menuItems.filter(item =>
     item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
   ) : [];
 
@@ -141,14 +137,14 @@ function RestaurantMenu({ addToCart }) {
                 +
               </button>
             </div>
-            <div class="add-to-cart-container">
-            <button
-              className="add-to-cart"
-              onClick={() => handleAddToCart(item)}
-              disabled={!item.quantity || item.quantity <= 0}
-            >
-              Add to Cart
-            </button>
+            <div className="add-to-cart-container">
+              <button
+                className="add-to-cart"
+                onClick={() => handleAddToCart(item)}
+                disabled={!item.quantity || item.quantity <= 0}
+              >
+                Add to Cart
+              </button>
             </div>
           </div>
         ))}

@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./components/Navbar/Navbar";
 import Login from "./components/Auth/Login/Login";
@@ -54,6 +49,8 @@ function App() {
       const { token, user } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", user.role);
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("username", user.username);
       setIsLoggedIn(true);
       setUserRole(user.role);
     } catch (error) {
@@ -65,6 +62,8 @@ function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
     localStorage.removeItem("cartItems");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
     setIsLoggedIn(false);
     setUserRole(null);
     setCartItems([]);
@@ -73,20 +72,24 @@ function App() {
   const handleSignup = (user) => {
     setIsLoggedIn(true);
     setUserRole(user.role);
-    const redirectPath = user.role === "admin" ? "/admin-panel" : 
-                        user.role === "restaurant" ? "/restaurant" : "/";
+    const redirectPath = 
+      user.role === "admin" 
+        ? "/admin-panel" 
+        : user.role === "restaurant" 
+        ? "/restaurant" 
+        : "/";
     window.location.href = redirectPath;
   };
 
   const addToCart = (item) => {
-    setCartItems(currentItems => {
+    setCartItems((currentItems) => {
       if (currentItems.length === 0) {
-        return [item];
+        return [{ ...item, restaurantId: item.restaurantId, restaurantName: item.restaurantName }];
       }
 
       if (currentItems[0].restaurantId === item.restaurantId) {
         const existingItemIndex = currentItems.findIndex(
-          cartItem => cartItem.id === item.id && cartItem.size === item.size
+          (cartItem) => cartItem.id === item.id && cartItem.size === item.size
         );
 
         if (existingItemIndex !== -1) {
@@ -95,37 +98,69 @@ function App() {
           return updatedItems;
         }
 
-        return [...currentItems, item];
+        return [...currentItems, { ...item, restaurantId: item.restaurantId, restaurantName: item.restaurantName }];
       }
 
-      alert(`Cannot add items from different restaurants. Your cart currently contains items from ${currentItems[0].restaurantName}`);
+      alert(
+        `Cannot add items from different restaurants. Your cart currently contains items from ${currentItems[0].restaurantName}`
+      );
       return currentItems;
     });
     setIsCartOpen(true);
   };
 
   const updateCartItemQuantity = (itemId, size, increment) => {
-    setCartItems(currentItems => {
-      return currentItems.map(item => {
-        if (item.id === itemId && item.size === size) {
-          const newQuantity = item.quantity + increment;
-          if (newQuantity <= 0) {
-            return null;
+    setCartItems((currentItems) => {
+      return currentItems
+        .map((item) => {
+          if (item.id === itemId && item.size === size) {
+            const newQuantity = item.quantity + increment;
+            if (newQuantity <= 0) {
+              return null;
+            }
+            return { ...item, quantity: newQuantity };
           }
-          return { ...item, quantity: newQuantity };
-        }
-        return item;
-      }).filter(Boolean);
+          return item;
+        })
+        .filter(Boolean);
     });
   };
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
   const closeCart = () => setIsCartOpen(false);
 
-  const handlePlaceOrder = () => {
-    setCartItems([]);
-    localStorage.removeItem("cartItems");
-    closeCart();
+  const handlePlaceOrder = async () => {
+    try {
+      // Prepare order data
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      const orderData = {
+        restaurant: cartItems[0].restaurantId,
+        customer: userId,
+        items: cartItems.map((item) => ({
+          menuItem: item.id,
+          quantity: item.quantity,
+          size: item.size,
+        })),
+        totalAmount: cartItems.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ),
+      };
+
+      // Make API call to place the order
+      const response = await axios.post("/api/orders", orderData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Handle success
+      console.log("Order placed successfully:", response.data);
+      setCartItems([]);
+      localStorage.removeItem("cartItems");
+    } catch (error) {
+      console.error("Error placing order:", error);
+      // Handle errors (e.g., show error message)
+    }
   };
 
   return (

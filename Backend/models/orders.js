@@ -9,24 +9,24 @@ const orderSchema = new mongoose.Schema({
         size: { type: String, required: true }
     }],
     totalAmount: { type: Number, required: true },
+    address: { type: String, required: true },
     orderStatus: {
         type: String,
-        enum: ['Placed', 'Accepted', 'Preparing', 'Ready', 'Delivered', 'Cancelled'],
-        default: 'Placed'
+        enum: ['Pending', 'Approved', 'Declined', 'Out for Delivery', 'Delivered'],
+        default: 'Pending'
     },
     createdAt: { type: Date, default: Date.now }
 });
 
 // Method to get the restaurant owner's ID
 orderSchema.methods.getRestaurantOwnerId = async function () {
-    const restaurant = await mongoose.model('Restaurant').findById(this.restaurant).populate('owner'); // Populate owner
+    const restaurant = await mongoose.model('Restaurant').findById(this.restaurant).populate('owner');
     if (!restaurant) {
-        throw new Error('Restaurant not found'); // Handle case where restaurant is not found
+        throw new Error('Restaurant not found');
     }
     return restaurant.owner;
 };
 
-// Define the model only if it hasn't been defined already
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 
 module.exports = Order;

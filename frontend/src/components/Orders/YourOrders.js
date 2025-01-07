@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./YourOrders.css";
+import axios from "axios";
 
 const YourOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -9,21 +10,39 @@ const YourOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders");
-        if (!response.ok) {
-          throw new Error("Failed to fetch orders");
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("Please login to view your orders");
+          setLoading(false);
+          return;
         }
-        const data = await response.json();
-        setOrders(data.orders);
-        setLoading(false);
+
+        const response = await axios.get("/api/orders", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.data && response.data.orders) {
+          const sortedOrders = response.data.orders.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setOrders(sortedOrders);
+        } else {
+          setOrders([]);
+        }
       } catch (err) {
-        setError(err.message);
+        console.error("Error fetching orders:", err);
+        setError(err.response?.data?.message || "Failed to fetch orders");
+      } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
+    const intervalId = setInterval(fetchOrders, 30000);
+    return () => clearInterval(intervalId);
   }, []);
+
+  // ... rest of the component code remains the same ...
 
   if (loading) {
     return <div className="your-orders-loading">Loading your orders...</div>;
@@ -53,17 +72,17 @@ const YourOrders = () => {
                     : "N/A"}
                 </p>
                 <p className="order-total">
-                  <b>Total Amount:</b> ${order.totalAmount?.toFixed(2) || "0.00"}
+                  <b>Total Amount:</b> ₹{order.totalAmount?.toFixed(2) || "0.00"}
                 </p>
                 <p className="order-status">
                   <b>Status:</b> {order.status || "Unknown"}
                 </p>
                 <div className="order-items">
-                  <b> Items:</b>
+                  <b>Items:</b>
                   <ul>
                     {order.items?.map((item, index) => (
                       <li key={index}>
-                        {item.name} - {item.quantity}x
+                        {item.menuItem.name} - {item.quantity} x ({item.size})
                       </li>
                     )) || <li>No items available</li>}
                   </ul>

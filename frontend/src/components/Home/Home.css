@@ -3,7 +3,7 @@
   padding: 40px;
   padding-top: 100px; /* Adjusted for space without logo */
   background-color: #f8f8f8;
-  min-height: 100vh;
+  min-height: 100vh; /* Ensure minimum height to cover the viewport */
   font-family: 'Roboto', Arial, sans-serif;
   position: relative;
   display: flex;
@@ -18,8 +18,10 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  z-index: 10; /* Ensure search bar is above other elements */
 }
 
+/* Form styling remains unchanged */
 .form {
   --input-bg: #fff;
   --padding: 1.5em;
@@ -137,8 +139,9 @@
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 40px; /* Add margin to separate from search bar */
   position: relative;
-  z-index: 1;
+  z-index: 1; /* Lower z-index than search container */
 }
 
 /* Restaurant Card Styling */
