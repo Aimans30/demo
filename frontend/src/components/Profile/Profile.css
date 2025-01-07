@@ -1,5 +1,7 @@
+/* profile.css */
+
 .profile-container {
-  max-width: 400px;
+  max-width: 400px; /* You might want to adjust this based on your design */
   margin: 0 auto;
   padding: 20px;
   background: #f9f9f9;
@@ -22,32 +24,9 @@
   margin-bottom: 5px;
 }
 
-/* Update the form-group input to have max-width 100% */
-.form-group input {
-  width: 100%;
-  max-width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
 .info-text {
   font-size: 12px;
   color: #666;
-}
-
-.btn-save {
-  width: 100%;
-  padding: 10px;
-  background: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-save:hover {
-  background: #45a049;
 }
 
 .success-message {
@@ -62,148 +41,146 @@
   margin-bottom: 10px;
 }
 
-/* Add the input container styles from the second CSS block */
-.input-container {
-    position: relative;
-    width: 100%;
-    max-width: 270px;
-}
-
-/* Add the combined input styles here */
+/* Input Box Styles */
 .input {
-    width: 100%;
-    max-width: 270px;
-    height: 60px;
-    padding: 12px;
-    font-size: 18px;
-    font-family: "Courier New", monospace;
-    color: #000;
-    background-color: #fff;
-    border: 4px solid #000;
-    border-radius: 0;
-    outline: none;
-    transition: all 0.3s ease;
-    box-shadow: 8px 8px 0 #000;
+  width: 90%; /* Use percentage for responsiveness */
+  max-width: 300px; /* Adjust max-width as needed */
+  height: 40px; /* Reduced height */
+  padding: 10px; /* Adjust padding as needed */
+  font-size: 16px;
+  font-family: "Courier New", monospace;
+  color: #000;
+  background-color: #fff;
+  border: 4px solid #000;
+  border-radius: 0;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 8px 8px 0 #000;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .input::placeholder {
-    color: #888;
+  color: #888;
 }
 
 .input:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 12px 12px 0 #000;
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 #000;
 }
 
 .input:focus {
-    background-color: #010101;
-    color: #fff;
-    border-color: #d6d9dd;
-    animation: shake 0.5s ease-in-out; /* Combined from second .input block */
+  background-color: #010101;
+  color: #fff;
+  border-color: #d6d9dd;
+  animation: shake 0.5s ease-in-out; /* Combined from second .input block */
 }
 
 .input:focus::placeholder {
-    color: #fff;
+  color: #fff;
 }
 
 .input:not(:placeholder-shown) {
-    animation: glitch 1s linear infinite; /* Combined from second .input block */
-    font-weight: bold;
-    letter-spacing: 1px;
-    text-shadow: 0px 0px 0 #000;
+  animation: glitch 1s linear infinite; /* Combined from second .input block */
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 0px 0px 0 #000;
 }
 
-/* Add the input-container styles */
-.input-container::after {
-    content: "|";
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #000;
-    animation: blink 0.7s step-end infinite;
+/* Button Styles */
+.btn-save {
+  padding: 15px 20px;
+  border: none;
+  outline: none;
+  background-color: #151515;
+  color: #eee;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-out;
+  width: 100%; /* Make button full width */
 }
 
-.input:focus + .input-container::after {
-    color: #fff;
+.btn-save:hover {
+  transform: translateY(-3px);
 }
 
-/* Add keyframe animations here */
+/* Keyframes for Animations */
 @keyframes shake {
-    0% {
-        transform: translateX(0);
-    }
-    25% {
-        transform: translateX(-5px) rotate(-5deg);
-    }
-    50% {
-        transform: translateX(5px) rotate(5deg);
-    }
-    75% {
-        transform: translateX(-5px) rotate(-5deg);
-    }
-    100% {
-        transform: translateX(0);
-    }
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px) rotate(-5deg);
+  }
+  50% {
+    transform: translateX(5px) rotate(5deg);
+  }
+  75% {
+    transform: translateX(-5px) rotate(-5deg);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 @keyframes glitch {
-    0% {
-        transform: none;
-        opacity: 1;
-    }
-    7% {
-        transform: skew(-0.5deg, -0.9deg);
-        opacity: 0.75;
-    }
-    10% {
-        transform: none;
-        opacity: 1;
-    }
-    27% {
-        transform: none;
-        opacity: 1;
-    }
-    30% {
-        transform: skew(0.8deg, -0.1deg);
-        opacity: 0.75;
-    }
-    35% {
-        transform: none;
-        opacity: 1;
-    }
-    52% {
-        transform: none;
-        opacity: 1;
-    }
-    55% {
-        transform: skew(-1deg, 0.2deg);
-        opacity: 0.75;
-    }
-    50% {
-        transform: none;
-        opacity: 1;
-    }
-    72% {
-        transform: none;
-        opacity: 1;
-    }
-    75% {
-        transform: skew(0.4deg, 1deg);
-        opacity: 0.75;
-    }
-    80% {
-        transform: none;
-        opacity: 1;
-    }
-    100% {
-        transform: none;
-        opacity: 1;
-    }
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  7% {
+    transform: skew(-0.5deg, -0.9deg);
+    opacity: 0.75;
+  }
+  10% {
+    transform: none;
+    opacity: 1;
+  }
+  27% {
+    transform: none;
+    opacity: 1;
+  }
+  30% {
+    transform: skew(0.8deg, -0.1deg);
+    opacity: 0.75;
+  }
+  35% {
+    transform: none;
+    opacity: 1;
+  }
+  52% {
+    transform: none;
+    opacity: 1;
+  }
+  55% {
+    transform: skew(-1deg, 0.2deg);
+    opacity: 0.75;
+  }
+  50% {
+    transform: none;
+    opacity: 1;
+  }
+  72% {
+    transform: none;
+    opacity: 1;
+  }
+  75% {
+    transform: skew(0.4deg, 1deg);
+    opacity: 0.75;
+  }
+  80% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
 }
 
 @keyframes blink {
-    50% {
-        opacity: 0;
-    }
+  50% {
+    opacity: 0;
+  }
 }
