@@ -1,4 +1,3 @@
-// Home.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -28,7 +27,7 @@ function Home() {
 
   useEffect(() => {
     const results = restaurants.filter(restaurant =>
-      restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (restaurant.name && restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (restaurant.address && restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredRestaurants(results);
