@@ -1,3 +1,5 @@
+/* src/index.css (or your main CSS file) */
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +7,69 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Background Image Styles */
+  background-image: url("/assets/backgroud.png"); /* Correct path for assets in public folder */
+  background-size: cover;          /* Cover the entire viewport */
+  background-repeat: no-repeat;     /* Prevent image from repeating */
+  background-position: center;      /* Center the image */
+  background-attachment: fixed;     /* Optional: Fixed background on scroll */
+  min-height: 100vh; /* Ensure minimum height to cover viewport */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Container for the restaurant cards */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* Adjust spacing as needed */
+  padding: 20px; /* Add padding around the cards */
+}
+
+/* Styles for individual restaurant cards (adjust as needed) */
+.restaurant-card {
+  width: 250px; /* Set a width for the cards */
+  margin-bottom: 20px; /* Add space between rows of cards */
+  border: 1px solid #ccc; /* Example border */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Example shadow */
+  /* ... other styles for your cards ... */
+}
+
+/* Placeholder for restaurant images */
+.restaurant-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Styles for the search bar (adjust as needed)*/
+
+.search-bar {
+    width: 50%;
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar input {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
+.search-bar button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }

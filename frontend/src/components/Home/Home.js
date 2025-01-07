@@ -45,17 +45,59 @@ function Home() {
   return (
     <div className="home-page">
       <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search restaurants by name or location..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className="search-input"
-        />
+      <form className="form" action="#!" role="search">
+        <label htmlFor="search">
+          <input
+            required=""
+            autoComplete="off"
+            placeholder="Search restaurants by name or location..."
+            id="search"
+            type="search"
+            name="search"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <div className="icon">
+            <svg
+              strokeWidth="2"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="swap-on"
+            >
+              <path
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              ></path>
+            </svg>
+            <svg
+              strokeWidth="2"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="swap-off"
+            >
+              <path
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              ></path>
+            </svg>
+          </div>
+          <button type="reset" className="close-btn">
+            <svg viewBox="0 0 20 20" height="20" width="20">
+              <path d="M10,8.6 L16,14.5 M10,14.5 L16,8.6" strokeWidth="1.5" stroke="currentColor"></path>
+            </svg>
+          </button>
+        </label>
+      </form>
       </div>
 
       {error && <p className="error-message">Error: {error}</p>}
-      
+
       <div className="restaurant-list">
         {filteredRestaurants.length > 0 ? (
           filteredRestaurants.map((restaurant) => (
