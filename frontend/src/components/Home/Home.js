@@ -14,8 +14,9 @@ function Home() {
     const fetchRestaurants = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/restaurants');
-        setRestaurants(response.data);
-        setFilteredRestaurants(response.data);
+        // Assuming the response structure has a 'restaurants' field
+        setRestaurants(response.data.restaurants || []); 
+        setFilteredRestaurants(response.data.restaurants || []); 
       } catch (error) {
         setError(error.message);
         console.error('Error fetching restaurants:', error);
