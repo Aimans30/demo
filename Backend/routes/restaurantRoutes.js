@@ -5,7 +5,6 @@ const authenticateToken = require('../middleware/authMiddleware');
 const User = require('../models/User');
 const Order = require('../models/orders');
 
-// Middleware to check if the user is a restaurant owner
 const isRestaurantOwner = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId);
@@ -18,33 +17,6 @@ const isRestaurantOwner = async (req, res, next) => {
     res.status(500).json({ message: 'Server error in isRestaurantOwner middleware' });
   }
 };
-
-// --- User Authentication Routes ---
-router.get('/panel', authenticateToken, isRestaurantOwner, async (req, res) => {
-  try {
-    const restaurant = await Restaurant.findOne({ owner: req.user.userId });
-    if (!restaurant) {
-      return res.status(404).json({ message: 'Restaurant not found' });
-    }
-
-    const pendingOrders = await Order.find({ 
-      restaurant: restaurant._id,
-      orderStatus: 'Placed'
-    }).populate('customer', 'username');
-
-    res.json({
-      restaurant,
-      pendingOrders,
-      message: 'Restaurant panel data fetched successfully'
-    });
-  } catch (error) {
-    console.error('Error fetching restaurant panel:', error);
-    res.status(500).json({ 
-      message: 'Failed to load restaurant panel', 
-      error: error.message 
-    });
-  }
-});
 
 router.get('/dashboard', authenticateToken, isRestaurantOwner, async (req, res) => {
   res.json({ message: 'Welcome to the restaurant dashboard', user: req.user });
@@ -72,16 +44,12 @@ router.get('/:restaurantId', async (req, res) => {
   }
 });
 
-// Updated route to handle orders for a specific restaurant by its ID
-router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async (req, res) => {
+router.get('/orders', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
-    const { restaurantId } = req.params;
-    const restaurant = await Restaurant.findOne({ _id: restaurantId, owner: req.user.userId });
-    
+    const restaurant = await Restaurant.findOne({ owner: req.user.userId });
     if (!restaurant) {
       return res.status(404).json({ message: 'Restaurant not found for this user' });
     }
-
     const orders = await Order.find({ restaurant: restaurant._id, orderStatus: 'Placed' })
       .populate('customer', 'username');
     res.json(orders);

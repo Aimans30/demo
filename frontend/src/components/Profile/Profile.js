@@ -6,7 +6,10 @@ const Profile = () => {
   const [profile, setProfile] = useState({
     fullName: "",
     phoneNumber: "",
-    password: "",
+    address: "",
+    oldPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
   });
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
@@ -25,7 +28,10 @@ const Profile = () => {
         setProfile({
           fullName: response.data.fullName,
           phoneNumber: response.data.phoneNumber,
-          password: "", // Don't prefill the password
+          address: response.data.address,
+          oldPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
         });
         setLoading(false);
       } catch (error) {
@@ -48,14 +54,31 @@ const Profile = () => {
     setSuccessMessage("");
     setErrorMessage("");
 
+    // Password validation (frontend)
+    if (profile.newPassword !== profile.confirmNewPassword) {
+      setErrorMessage("New password and confirm new password do not match.");
+      return;
+    }
+
+    if (profile.newPassword) {
+      if (!/(?=.*[A-Z])(?=.*\d)/.test(profile.newPassword)) {
+        setErrorMessage(
+          "New password must contain at least one capital letter and one number."
+        );
+        return;
+      }
+    }
+
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const response = await axios.put(
         "/api/profile",
         {
           fullName: profile.fullName,
           phoneNumber: profile.phoneNumber,
-          password: profile.password,
+          address: profile.address,
+          oldPassword: profile.oldPassword,
+          newPassword: profile.newPassword,
         },
         {
           headers: {
@@ -63,7 +86,20 @@ const Profile = () => {
           },
         }
       );
+
+      // Check for password error from the backend
+      if (response.data.error === "Incorrect old password") {
+        setErrorMessage("Incorrect old password.");
+        return;
+      }
+
       setSuccessMessage("Profile updated successfully.");
+      setProfile({
+        ...profile,
+        oldPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
     } catch (error) {
       console.error("Error updating profile:", error.message);
       setErrorMessage("Failed to update profile. Please try again.");
@@ -89,6 +125,8 @@ const Profile = () => {
             value={profile.fullName}
             onChange={handleChange}
             required
+            className="input"
+            placeholder="Enter Full Name"
           />
         </div>
         <div className="form-group">
@@ -100,20 +138,59 @@ const Profile = () => {
             value={profile.phoneNumber}
             onChange={handleChange}
             required
+            className="input"
+            placeholder="Enter Phone Number"
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">New Password:</label>
+          <label htmlFor="address">Address:</label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            value={profile.address}
+            onChange={handleChange}
+            required
+            className="input"
+            placeholder="Enter Address"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="oldPassword">Old Password:</label>
           <input
             type="password"
-            id="password"
-            name="password"
-            value={profile.password}
+            id="oldPassword"
+            name="oldPassword"
+            value={profile.oldPassword}
             onChange={handleChange}
+            required
+            className="input"
+            placeholder="Enter Old Password"
           />
-          <small className="info-text">
-            Leave blank if you don't want to change the password.
-          </small>
+        </div>
+        <div className="form-group">
+          <label htmlFor="newPassword">New Password:</label>
+          <input
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            value={profile.newPassword}
+            onChange={handleChange}
+            className="input"
+            placeholder="Enter New Password"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="confirmNewPassword">Confirm New Password:</label>
+          <input
+            type="password"
+            id="confirmNewPassword"
+            name="confirmNewPassword"
+            value={profile.confirmNewPassword}
+            onChange={handleChange}
+            className="input"
+            placeholder="Confirm New Password"
+          />
         </div>
         <button type="submit" className="btn-save">
           Save Changes

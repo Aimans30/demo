@@ -1,11 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import "./Cart.css";
 
 function Cart({ cartItems, onClose, onPlaceOrder, updateQuantity }) {
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const navigate = useNavigate();
-
   if (!cartItems || cartItems.length === 0) {
     return (
       <div className="cart-overlay">
@@ -36,49 +32,6 @@ function Cart({ cartItems, onClose, onPlaceOrder, updateQuantity }) {
     0
   );
 
-  const handlePlaceOrder = async () => {
-    try {
-      setIsPlacingOrder(true);
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Please log in to place an order");
-        return;
-      }
-
-      const orderData = {
-        items: cartItems.map(item => ({
-          menuItem: item.id,
-          quantity: item.quantity,
-          size: item.size,
-          price: item.price
-        })),
-        restaurantId: cartItems[0].restaurantId,
-        totalAmount: totalPrice
-      };
-
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to place order");
-      }
-
-      alert("Order placed successfully! Redirecting to your orders...");
-      onPlaceOrder();
-      navigate("/your-orders");
-    } catch (error) {
-      alert(error.message || "Failed to place order");
-    } finally {
-      setIsPlacingOrder(false);
-    }
-  };
-
   return (
     <div className="cart-overlay">
       <div className="cart-container">
@@ -96,21 +49,21 @@ function Cart({ cartItems, onClose, onPlaceOrder, updateQuantity }) {
                 <span className="item-size"> ({item.size})</span>
               </div>
               <div className="item-quantity">
-                <button 
-                  className="quantity-btn"
-                  onClick={() => updateQuantity(item.id, item.size, -1)}
-                  disabled={isPlacingOrder}
-                >
-                  -
-                </button>
+              <button 
+  className="quantity-btn" 
+  aria-label="Decrease quantity"
+  onClick={() => updateQuantity(item.id, item.size, -1)}
+>
+  -
+</button>
                 <span>x {item.quantity}</span>
                 <button 
-                  className="quantity-btn"
-                  onClick={() => updateQuantity(item.id, item.size, 1)}
-                  disabled={isPlacingOrder}
-                >
-                  +
-                </button>
+  className="quantity-btn" 
+  aria-label="Increase quantity"
+  onClick={() => updateQuantity(item.id, item.size, 1)}
+>
+  +
+</button>
               </div>
               <div className="item-price">
                 <span>₹{item.price * item.quantity}</span>
@@ -124,12 +77,8 @@ function Cart({ cartItems, onClose, onPlaceOrder, updateQuantity }) {
             <span>Total:</span>
             <span>₹{totalPrice}</span>
           </div>
-          <button 
-            className="place-order-button" 
-            onClick={handlePlaceOrder}
-            disabled={isPlacingOrder}
-          >
-            {isPlacingOrder ? "Placing Order..." : "Place Order"}
+          <button className="place-order-button" onClick={onPlaceOrder}>
+            Place Order
           </button>
         </div>
       </div>
