@@ -21,8 +21,15 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: "Valid total amount is required." });
     }
 
-    // Create a new order
-    const order = new Order({ restaurant, customer, items, totalAmount });
+    // Create a new order with default status 'Placed'
+    const order = new Order({
+      restaurant,
+      customer,
+      items,
+      totalAmount,
+      orderStatus: 'Placed' // Add default status
+    });
+
     await order.save();
 
     // Fetch the restaurant owner's ID (replace with actual logic if needed)
@@ -33,10 +40,18 @@ router.post('/', async (req, res) => {
 
     console.log("Restaurant Owner ID:", ownerId); // Debugging/Notifications logic
 
-    res.status(201).json({ message: "Order placed successfully.", order });
+    // Return the success response with order details and orderId
+    res.status(201).json({
+      message: "Order placed successfully.",
+      order,
+      orderId: order._id // Add order ID in response
+    });
   } catch (error) {
     console.error("Error placing order:", error.message);
-    res.status(500).json({ message: 'Server error.', error: error.message });
+    res.status(500).json({
+      message: 'Failed to place order.',
+      error: error.message
+    });
   }
 });
 

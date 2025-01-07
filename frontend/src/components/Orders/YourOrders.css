@@ -1,29 +1,156 @@
+/* Container styles */
 .your-orders-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .your-orders-loading,
-  .your-orders-error {
-    text-align: center;
-    color: #333;
-    font-size: 18px;
-  }
-  
-  .your-orders-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .your-order-item {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    padding: 15px;
-    background-color: #f9f9f9;
-  }
-  
-  .order-details p {
-    margin: 5px 0;
-  }
-  
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f9fafb;
+  border-radius: 10px;
+}
+
+/* Loading and error states */
+.your-orders-loading,
+.your-orders-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.your-orders-error {
+  color: #dc3545;
+}
+
+.your-orders-loading {
+  color: #4b5563;
+}
+
+/* Orders list */
+.your-orders-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Order item styles */
+.your-order-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 1.5rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-details p {
+  margin: 0;
+}
+
+/* Order header and status */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.order-status {
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  display: inline-block;
+}
+
+.status-waiting {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-confirmed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status.placed {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status.accepted {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status.rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Restaurant info */
+.restaurant-info {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Order items */
+.order-items {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 0;
+}
+
+.order-items ul {
+  margin-top: 5px;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Order total */
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+/* Order timestamp */
+.order-timestamp {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* General spacing and layout improvements */
+.your-orders-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f9fafb;
+  border-radius: 10px;
+}
