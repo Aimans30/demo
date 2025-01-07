@@ -31,7 +31,6 @@ mongoose.connect(mongoURI)
   });
 
 // --- Routes ---
-const adminRoutes = require('./routes/admin');
 const orderRoutes = require('./routes/orders');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -40,7 +39,6 @@ const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes); // User routes
 app.use('/api/restaurants', restaurantRoutes); // Restaurant routes
 app.use('/api/orders', orderRoutes); // Order routes
-app.use('/admin', adminRoutes); // Admin panel routes
 
 // --- Error Handling ---
 
