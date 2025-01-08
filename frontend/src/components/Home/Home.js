@@ -15,18 +15,15 @@ const Home = () => {
       setLoading(true);
       try {
         const response = await axios.get('http://localhost:5000/api/restaurants');
-        if (response.status === 200) {
-          // Sort the restaurants so "chaiza" appears first
-          const sortedRestaurants = response.data.sort((a, b) => {
-            if (a.name.toLowerCase() === "chaizza") return -1; // Bring "chaiza" to the top
-            if (b.name.toLowerCase() === "chaizza") return 1;  // Push other items down
-            return 0; // Keep the rest unchanged
-          });
-          setRestaurants(sortedRestaurants);
-          setError(null);
-        } else {
-          setError('Failed to fetch restaurants');
-        }
+        const openRestaurants = response.data.filter(restaurant => restaurant.isActive);
+        // Sort the restaurants so "chaiza" appears first
+        const sortedRestaurants = openRestaurants.sort((a, b) => {
+          if (a.name.toLowerCase() === "chaizza") return -1; // Bring "chaizza" to the top
+          if (b.name.toLowerCase() === "chaizza") return 1;  // Push other items down
+          return 0; // Keep the rest unchanged
+        });
+        setRestaurants(sortedRestaurants);
+        setError(null);
       } catch (err) {
         console.error('Error fetching restaurants:', err.response ? err.response.data : err.message);
         setError('Error fetching restaurant data. Please try again.');

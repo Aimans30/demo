@@ -323,7 +323,36 @@ router.post('/:restaurantId/menu', authenticateToken, isRestaurantOwner, async (
     res.status(500).json({ message: 'Error adding menu item', error: error.message });
   }
 });
+// Toggle restaurant status
+router.put('/:restaurantId/toggle-status', authenticateToken, isRestaurantOwner, async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+    restaurant.isActive = !restaurant.isActive;
+    await restaurant.save();
+    res.json({ message: `Restaurant is now ${restaurant.isActive ? 'open' : 'closed'}`, isActive: restaurant.isActive });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating restaurant status', error: error.message });
+  }
+});
 
+// Set opening time for the next day
+router.put('/:restaurantId/set-opening-time', authenticateToken, isRestaurantOwner, async (req, res) => {
+  try {
+    const { openingTime } = req.body;
+    const restaurant = await Restaurant.findById(req.params.restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+    restaurant.openingTime = openingTime;
+    await restaurant.save();
+    res.json({ message: 'Opening time set successfully', openingTime });
+  } catch (error) {
+    res.status(500).json({ message: 'Error setting opening time', error: error.message });
+  }
+});
 // Update menu item
 router.put('/menu/:itemId', authenticateToken, async (req, res) => {
   try {

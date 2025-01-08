@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './RestaurantPanel.css';
 
@@ -12,6 +12,8 @@ const RestaurantPanel = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const [menu, setMenu] = useState([]);
   const [showAddItemForm, setShowAddItemForm] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [openingTime, setOpeningTime] = useState('');
 
   useEffect(() => {
     const fetchRestaurantId = async () => {
@@ -22,6 +24,7 @@ const RestaurantPanel = () => {
         });
         if (response.data.restaurant) {
           setRestaurantId(response.data.restaurant._id);
+          setIsOpen(response.data.restaurant.isActive || false);
           fetchMenu(response.data.restaurant._id);
         } else {
           setError('No restaurant associated with this account.');
@@ -48,38 +51,38 @@ const RestaurantPanel = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!restaurantId) return;
+  const fetchOrders = useCallback(async () => {
+    if (!restaurantId) return;
 
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/restaurants/${restaurantId}/orders`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`/api/restaurants/${restaurantId}/orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        if (response.data && Array.isArray(response.data)) {
-          const sortedOrders = response.data.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          setOrders(sortedOrders);
-        } else {
-          setError('Invalid orders data format received from server');
-        }
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch orders.');
-      } finally {
-        setLoading(false);
+      if (response.data && Array.isArray(response.data)) {
+        const sortedOrders = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setOrders(sortedOrders);
+      } else {
+        setError('Invalid orders data format received from server');
       }
-    };
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch orders.');
+    } finally {
+      setLoading(false);
+    }
+  }, [restaurantId]);
 
+  useEffect(() => {
     if (restaurantId) {
       fetchOrders();
       const intervalId = setInterval(fetchOrders, 30000);
       return () => clearInterval(intervalId);
     }
-  }, [restaurantId]);
+  }, [fetchOrders]);
 
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
     try {
@@ -126,9 +129,42 @@ const RestaurantPanel = () => {
     return orderItems.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const handleToggleStatus = async () => {
+    if (!restaurantId) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `/api/restaurants/${restaurantId}/toggle-status`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIsOpen(!isOpen);
+      fetchOrders();
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
+
+  const handleSetOpeningTime = async () => {
+    if (!restaurantId) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `/api/restaurants/${restaurantId}/set-opening-time`,
+        { openingTime },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert('Opening time set for tomorrow.');
+      fetchOrders();
+    } catch (error) {
+      console.error('Failed to set opening time:', error);
+    }
+  };
+
   return (
     <div className="restaurant-panel">
-      {/* Heading and Buttons */}
       <div className="dashboard-header">
         <h1>Restaurant Dashboard</h1>
         <div className="toggle-buttons">
@@ -152,7 +188,23 @@ const RestaurantPanel = () => {
           </button>
         </div>
       </div>
-
+      <div>
+        <label>
+          Restaurant Status:
+          <input
+            type="checkbox"
+            checked={isOpen}
+            onChange={handleToggleStatus}
+          />
+          {isOpen ? 'Open' : 'Closed'}
+        </label>
+        <input
+          type="datetime-local"
+          value={openingTime}
+          onChange={(e) => setOpeningTime(e.target.value)}
+        />
+        <button onClick={handleSetOpeningTime}>Set Opening Time</button>
+      </div>
       {loading ? (
         <div className="loading">Loading...</div>
       ) : error ? (
@@ -170,7 +222,6 @@ const RestaurantPanel = () => {
                     {order.orderStatus}
                   </span>
                 </div>
-
                 <div className="order-details">
                   <p>
                     <strong>Customer:</strong> {order.customer?.username || 'Anonymous'}
@@ -195,7 +246,6 @@ const RestaurantPanel = () => {
                     <strong>Ordered at:</strong> {formatDate(order.createdAt)}
                   </p>
                 </div>
-
                 <div className="order-items">
                   <h4>Order Items:</h4>
                   <ul>
@@ -216,7 +266,6 @@ const RestaurantPanel = () => {
                     ))}
                   </ul>
                 </div>
-
                 {['Placed', 'Accepted', 'Preparing', 'Ready'].includes(order.orderStatus) && (
                   <div className="order-actions">
                     {order.orderStatus === 'Placed' && (
