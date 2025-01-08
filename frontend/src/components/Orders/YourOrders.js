@@ -9,14 +9,23 @@ const YourOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders");
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:5000/api/orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (!response.ok) {
-          throw new Error("Failed to fetch orders");
+          const errorData = await response.json(); // Parse error response
+          throw new Error(errorData.message || "Failed to fetch orders");
         }
+
         const data = await response.json();
         setOrders(data.orders);
         setLoading(false);
       } catch (err) {
+        console.error("Error fetching orders:", err.message); // Log the error
         setError(err.message);
         setLoading(false);
       }
@@ -53,10 +62,10 @@ const YourOrders = () => {
                     : "N/A"}
                 </p>
                 <p className="order-total">
-                  <b>Total Amount:</b> ${order.totalAmount?.toFixed(2) || "0.00"}
+                  <b>Total Amount:</b> ₹{order.totalAmount?.toFixed(2) || "0.00"}
                 </p>
                 <p className="order-status">
-                  <b>Status:</b> {order.status || "Unknown"}
+                  <b>Status:</b> {order.orderStatus || "Unknown"}
                 </p>
                 <div className="order-items">
                   <b> Items:</b>

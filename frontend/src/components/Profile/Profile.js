@@ -4,8 +4,8 @@ import "./Profile.css";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
-    fullName: "",
-    phoneNumber: "",
+    username: "", // Changed fullName to username
+    mobileNumber: "", // Changed phoneNumber to mobileNumber
     address: "",
     oldPassword: "",
     newPassword: "",
@@ -20,14 +20,14 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("/api/profile", {
+        const response = await axios.get("/api/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setProfile({
-          fullName: response.data.fullName,
-          phoneNumber: response.data.phoneNumber,
+          username: response.data.username,
+          mobileNumber: response.data.mobileNumber,
           address: response.data.address,
           oldPassword: "",
           newPassword: "",
@@ -35,7 +35,7 @@ const Profile = () => {
         });
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching profile:", error.message);
+        console.error("Error fetching profile:", error.response ? error.response.data.message : error.message);
         setErrorMessage("Failed to load profile. Please try again.");
         setLoading(false);
       }
@@ -72,10 +72,10 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        "/api/profile",
+        "/api/users/profile",
         {
-          fullName: profile.fullName,
-          phoneNumber: profile.phoneNumber,
+          username: profile.username,
+          mobileNumber: profile.mobileNumber,
           address: profile.address,
           oldPassword: profile.oldPassword,
           newPassword: profile.newPassword,
@@ -88,8 +88,8 @@ const Profile = () => {
       );
 
       // Check for password error from the backend
-      if (response.data.error === "Incorrect old password") {
-        setErrorMessage("Incorrect old password.");
+      if (response.data.error) {
+        setErrorMessage(response.data.message);
         return;
       }
 
@@ -101,7 +101,7 @@ const Profile = () => {
         confirmNewPassword: "",
       });
     } catch (error) {
-      console.error("Error updating profile:", error.message);
+      console.error("Error updating profile:", error.response ? error.response.data.message : error.message);
       setErrorMessage("Failed to update profile. Please try again.");
     }
   };
@@ -117,27 +117,27 @@ const Profile = () => {
       {errorMessage && <p className="error-message">{errorMessage}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="fullName">Full Name:</label>
+          <label htmlFor="username">User Name:</label>
           <input
             type="text"
-            id="fullName"
-            name="fullName"
-            value={profile.fullName}
+            id="username"
+            name="username"
+            value={profile.username}
             onChange={handleChange}
-            required
+            
             className="input"
-            placeholder="Enter Full Name"
+            placeholder="Enter User Name"
           />
         </div>
         <div className="form-group">
-          <label htmlFor="phoneNumber">Phone Number:</label>
+          <label htmlFor="mobileNumber">Phone Number:</label>
           <input
             type="text"
-            id="phoneNumber"
-            name="phoneNumber"
-            value={profile.phoneNumber}
+            id="mobileNumber"
+            name="mobileNumber"
+            value={profile.mobileNumber}
             onChange={handleChange}
-            required
+            
             className="input"
             placeholder="Enter Phone Number"
           />
@@ -150,7 +150,7 @@ const Profile = () => {
             name="address"
             value={profile.address}
             onChange={handleChange}
-            required
+            
             className="input"
             placeholder="Enter Address"
           />
@@ -163,7 +163,7 @@ const Profile = () => {
             name="oldPassword"
             value={profile.oldPassword}
             onChange={handleChange}
-            required
+            
             className="input"
             placeholder="Enter Old Password"
           />

@@ -1,18 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Order = require('../models/orders'); // Import Order model
+const Order = require("../models/orders");
+const authenticateToken = require("../middleware/authMiddleware");
 
 // POST /api/orders - Place a new order
-router.post('/', async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   try {
-    const { restaurant, customer, items, totalAmount } = req.body;
+    const { restaurant, items, totalAmount } = req.body;
+    const customer = req.user.userId; // Get the user ID from the token
 
     // Input Validation
     if (!restaurant) {
       return res.status(400).json({ message: "Restaurant ID is required." });
-    }
-    if (!customer) {
-      return res.status(400).json({ message: "Customer ID is required." });
     }
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "Order items are required." });
@@ -22,67 +21,40 @@ router.post('/', async (req, res) => {
     }
 
     // Create a new order
-    const order = new Order({ restaurant, customer, items, totalAmount });
+    const order = new Order({
+      restaurant,
+      customer,
+      items,
+      totalAmount,
+      orderStatus: "Placed",
+    });
+
     await order.save();
-
-    // Fetch the restaurant owner's ID (replace with actual logic if needed)
-    const ownerId = await order.getRestaurantOwnerId?.();
-    if (!ownerId) {
-      return res.status(404).json({ message: "Restaurant owner not found." });
-    }
-
-    console.log("Restaurant Owner ID:", ownerId); // Debugging/Notifications logic
 
     res.status(201).json({ message: "Order placed successfully.", order });
   } catch (error) {
-    console.error("Error placing order:", error.message);
-    res.status(500).json({ message: 'Server error.', error: error.message });
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "Server error.", error: error.message });
   }
 });
 
-// GET /api/orders - Retrieve all orders
-router.get('/', async (req, res) => {
+// GET /api/orders - Fetch orders for the currently logged-in user
+router.get("/", authenticateToken, async (req, res) => {
   try {
-    const orders = await Order.find();
+    const customerId = req.user.userId; // Get the user ID from the token
+    console.log("Fetching orders for customer ID:", customerId); // Debug log
+
+    // Fetch orders for the logged-in user
+    const orders = await Order.find({ customer: customerId })
+      .populate("restaurant", "name") // Populate restaurant details
+      .populate("items.menuItem", "name price") // Populate menu item details
+      .sort({ createdAt: -1 });
+
+    console.log("Orders fetched:", orders); // Debug log
     res.status(200).json({ orders });
   } catch (error) {
-    console.error("Error retrieving orders:", error.message);
-    res.status(500).json({ message: 'Server error.', error: error.message });
-  }
-});
-
-// GET /api/orders/:orderId - Retrieve a specific order by ID
-router.get('/:orderId', async (req, res) => {
-  try {
-    const { orderId } = req.params;
-
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ message: "Order not found." });
-    }
-
-    res.status(200).json({ order });
-  } catch (error) {
-    console.error("Error retrieving order:", error.message);
-    res.status(500).json({ message: 'Server error.', error: error.message });
-  }
-});
-
-// PATCH /api/orders/:orderId - Update order status or details
-router.patch('/:orderId', async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const updates = req.body;
-
-    const order = await Order.findByIdAndUpdate(orderId, updates, { new: true });
-    if (!order) {
-      return res.status(404).json({ message: "Order not found." });
-    }
-
-    res.status(200).json({ message: "Order updated successfully.", order });
-  } catch (error) {
-    console.error("Error updating order:", error.message);
-    res.status(500).json({ message: 'Server error.', error: error.message });
+    console.error("Error fetching orders:", error.message);
+    res.status(500).json({ message: "Server error.", error: error.message });
   }
 });
 

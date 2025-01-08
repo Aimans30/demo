@@ -11,10 +11,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // --- Middleware ---
-// CORS - Restrict origins in production
 app.use(cors({
-  origin: ['http://localhost:3000'] // Replace with your frontend URLs in production
+  origin: 'http://localhost:3000', // Allow requests from the frontend
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // Add PATCH here
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 app.use(express.json());
 app.use(helmet());
 
@@ -27,20 +30,18 @@ mongoose.connect(mongoURI)
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit with error if connection fails
+    process.exit(1);
   });
 
 // --- Routes ---
-const orderRoutes = require('./routes/orders');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const userRoutes = require('./routes/userRoutes');
+const orderRoutes = require('./routes/orders');
 
-// Mount routes with appropriate base paths (adjusted order)
-app.use('/api/users', userRoutes); // User routes
-app.use('/api/restaurants', restaurantRoutes); // Restaurant routes
-app.use('/api/orders', orderRoutes); // Order routes
-
-// --- Error Handling ---
+// Mount routes with appropriate base paths
+app.use('/api/restaurants', restaurantRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
 
 // 404 Not Found Handler
 app.use((req, res, next) => {
@@ -50,10 +51,14 @@ app.use((req, res, next) => {
 // General Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Internal server error' });
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    message: err.message || 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err : {}
+  });
 });
 
-// --- Graceful Shutdown ---
+// Graceful Shutdown
 process.on('SIGINT', async () => {
   try {
     await mongoose.connection.close();
@@ -65,5 +70,5 @@ process.on('SIGINT', async () => {
   }
 });
 
-// --- Start the Server ---
+// Start the Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

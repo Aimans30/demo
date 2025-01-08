@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./components/Navbar/Navbar";
 import Login from "./components/Auth/Login/Login";
@@ -24,6 +19,8 @@ function App() {
   const [userRole, setUserRole] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const API_BASE_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
     const fetchUserStatus = async () => {
@@ -50,7 +47,7 @@ function App() {
 
   const handleLogin = async (credentials) => {
     try {
-      const response = await axios.post("/api/users/login", credentials);
+      const response = await axios.post(`${API_BASE_URL}/users/login`, credentials);
       const { token, user } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", user.role);

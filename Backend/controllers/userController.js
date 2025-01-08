@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
-const Restaurant = require('../models/restaurantModel');  // Import Restaurant model
+const Restaurant = require('../models/restaurantModel');
 const User = require('../models/User');
+
 module.exports = {
   signup: async (req, res) => {
     const errors = validationResult(req);
@@ -76,7 +77,7 @@ module.exports = {
 
   assignRole: async (req, res) => {
     const { userId } = req.params;
-    const { role } = req.body;
+    const { role, restaurantId, newRestaurantData } = req.body;
 
     try {
       const user = await User.findById(userId);
@@ -85,8 +86,30 @@ module.exports = {
       }
 
       user.role = role;
-      await user.save();
 
+      if (role === 'restaurant') {
+        if (restaurantId) {
+          const restaurant = await Restaurant.findById(restaurantId);
+          if (!restaurant) {
+            return res.status(404).json({ message: 'Restaurant not found' });
+          }
+          restaurant.owner = user._id;
+          await restaurant.save();
+          user.restaurant = restaurant._id;
+        } else if (newRestaurantData) {
+          const restaurant = new Restaurant({
+            name: newRestaurantData.name,
+            address: newRestaurantData.address,
+            owner: user._id,
+          });
+          await restaurant.save();
+          user.restaurant = restaurant._id;
+        } else {
+          return res.status(400).json({ message: 'Restaurant data is required for restaurant role' });
+        }
+      }
+
+      await user.save();
       res.status(200).json({ message: 'Role assigned successfully', user });
     } catch (error) {
       console.error(error);
@@ -96,7 +119,7 @@ module.exports = {
 
   getAllUsers: async (req, res) => {
     try {
-      const users = await User.find();
+      const users = await User.find().populate('restaurant');
       res.status(200).json(users);
     } catch (error) {
       console.error(error);
@@ -106,7 +129,7 @@ module.exports = {
 
   getUserById: async (req, res) => {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params.id).populate('restaurant');
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -157,7 +180,7 @@ module.exports = {
         return res.status(404).json({ message: 'User or Restaurant not found' });
       }
 
-      user.role = 'restaurant';  // Ensure user role is 'restaurant'
+      user.role = 'restaurant';
       restaurant.owner = user._id;
       await user.save();
       await restaurant.save();
@@ -181,5 +204,28 @@ module.exports = {
       console.error(error);
       res.status(500).json({ message: 'Server error', error });
     }
-  }
+  },
+
+  // Add this function to update the user's address
+  updateAddress: async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { address } = req.body;
+
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { address },
+        { new: true }
+      );
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.status(200).json({ message: 'Address updated successfully', user });
+    } catch (error) {
+      console.error('Error updating address:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  },
 };

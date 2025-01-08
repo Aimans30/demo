@@ -12,7 +12,7 @@ body {
   border-radius: 8px;
   overflow: hidden;
   padding: 20px;
-  margin-left: 60px; /* Ensure content starts after the navbar */
+  margin-left: 60px;
 }
 
 .admin-panel h1 {
@@ -26,7 +26,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
-  table-layout: fixed; /* Enable fixed-width columns */
+  table-layout: fixed;
 }
 
 .admin-panel th,
@@ -35,7 +35,7 @@ body {
   padding: 10px;
   text-align: center;
   font-size: 0.9rem;
-  word-wrap: break-word; /* Handle text overflow */
+  word-wrap: break-word;
 }
 
 .admin-panel th {
@@ -52,25 +52,24 @@ body {
   background-color: #e9ecef;
 }
 
-/* Adjusting column widths */
 .admin-panel th:nth-child(1),
 .admin-panel td:nth-child(1) {
-  width: 15%; /* Name column */
+  width: 15%;
 }
 
 .admin-panel th:nth-child(2),
 .admin-panel td:nth-child(2) {
-  width: 15%; /* Mobile Number column */
+  width: 15%;
 }
 
 .admin-panel th:nth-child(3),
 .admin-panel td:nth-child(3) {
-  width: 10%; /* Current Role column */
+  width: 10%;
 }
 
 .admin-panel th:nth-child(4),
 .admin-panel td:nth-child(4) {
-  width: 30%; /* Actions column */
+  width: 30%;
 }
 
 .admin-panel select,
@@ -78,7 +77,7 @@ body {
   margin: 5px 0;
   padding: 8px;
   font-size: 0.9rem;
-  width: auto; /* Adjust width for smaller buttons */
+  width: auto;
   border: 1px solid #ced4da;
   border-radius: 4px;
   box-sizing: border-box;
@@ -102,28 +101,25 @@ body {
   margin-top: 10px;
 }
 
-/* Keep Navbar Fixed and Content Visible */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 60px; /* Set the width of the navbar */
+  width: 60px;
   height: 100%;
-  background-color: #ffc107; /* Same as your navbar's color */
+  background-color: #ffc107;
   z-index: 1000;
 }
 
-/* Center-align the table container */
 .admin-panel-container {
   margin: 30px auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-left: 0; /* No additional shift for the table content */
+  padding-left: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .admin-panel h1 {
     font-size: 1.5rem;
@@ -131,7 +127,7 @@ body {
 
   .admin-panel-container {
     padding: 15px;
-    margin-left: 60px; /* Ensure space for the navbar on smaller screens */
+    margin-left: 60px;
   }
 
   .admin-panel table th,
@@ -141,15 +137,15 @@ body {
 
   .admin-panel th:nth-child(1),
   .admin-panel td:nth-child(1) {
-    width: 30%; /* Adjust Name column width on smaller screens */
+    width: 30%;
   }
 
   .admin-panel th:nth-child(4),
   .admin-panel td:nth-child(4) {
-    width: 40%; /* Adjust Actions column width on smaller screens */
+    width: 40%;
   }
 }
-/* Assign Role Button Styling */
+
 .admin-panel button {
   background-color: #3DD1E7;
   border: 0 solid #E5E7EB;
@@ -162,17 +158,16 @@ body {
   justify-content: center;
   line-height: 1.75rem;
   padding: 0.75rem 1.65rem;
-  align-items: center; /* Ensure text inside is centered */
-  max-width: 210px; /* Reduced width */
-  width: 100%; /* Full width by default */
+  align-items: center;
+  max-width: 210px;
+  width: 100%;
   position: relative;
   cursor: pointer;
   transform: rotate(-2deg);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
-  margin: 0 auto; /* Center-aligns the button */
-
+  margin: 0 auto;
 }
 
 .admin-panel button:focus {
@@ -201,7 +196,6 @@ body {
   }
 }
 
-/* Assign Role Dropdown */
 .role-select {
   width: 200px;
   padding: 8px 12px;
@@ -227,7 +221,6 @@ body {
   background-color: #fff;
 }
 
-/* Assign Role Button */
 .assign-role-btn {
   margin-top: 8px;
   padding: 10px 16px;
@@ -250,7 +243,6 @@ body {
   background-color: #0077b6;
 }
 
-/* Restaurant Dropdown */
 .restaurant-select {
   width: 200px;
   margin-top: 8px;
@@ -277,7 +269,6 @@ body {
   background-color: #fff;
 }
 
-/* Table Styling for Better Layout */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -310,7 +301,6 @@ tr:hover td {
   background-color: #eaf4ff;
 }
 
-/* Success and Error Messages */
 .success-message {
   padding: 10px 15px;
   margin-bottom: 20px;
@@ -329,7 +319,6 @@ tr:hover td {
   border-radius: 6px;
 }
 
-/* Loading Spinner */
 .loading {
   font-size: 16px;
   font-weight: 500;
