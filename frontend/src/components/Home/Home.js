@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './Home.css';
+import placeholderImage from './placeholder.jpg'; // Import the fallback placeholder image
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -13,10 +14,15 @@ const Home = () => {
     const fetchRestaurants = async () => {
       setLoading(true);
       try {
-        // Use the full backend URL if necessary
         const response = await axios.get('http://localhost:5000/api/restaurants');
         if (response.status === 200) {
-          setRestaurants(response.data);
+          // Sort the restaurants so "chaiza" appears first
+          const sortedRestaurants = response.data.sort((a, b) => {
+            if (a.name.toLowerCase() === "chaizza") return -1; // Bring "chaiza" to the top
+            if (b.name.toLowerCase() === "chaizza") return 1;  // Push other items down
+            return 0; // Keep the rest unchanged
+          });
+          setRestaurants(sortedRestaurants);
           setError(null);
         } else {
           setError('Failed to fetch restaurants');
@@ -39,15 +45,12 @@ const Home = () => {
   // Apply filter only if searchQuery is not empty
   const filteredRestaurants = searchQuery
     ? restaurants.filter(restaurant =>
-      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+        restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     : restaurants;
 
   return (
     <div className="home-page">
-      <div className="logo-container">
-<img src={process.env.PUBLIC_URL + "/logo.png"} alt="Logo" className="logo" />
-</div>
       <div className="search-container">
         <form className="form">
           <label htmlFor="searchInput">
@@ -113,7 +116,13 @@ const Home = () => {
           ) : (
             filteredRestaurants.map((restaurant) => (
               <Link to={`/restaurant/${restaurant._id}`} key={restaurant._id} className="restaurant-card">
-                <img src={restaurant.imageUrl || 'https://via.placeholder.com/150'} alt={restaurant.name} />
+                <img
+                  src={restaurant.imageUrl || placeholderImage} // Use restaurant.imageUrl or fallback to placeholder
+                  alt={restaurant.name}
+                  onError={(e) => {
+                    e.target.src = placeholderImage; // Fallback if imageUrl is broken
+                  }}
+                />
                 <div className="restaurant-info">
                   <h3>{restaurant.name}</h3>
                   <p>{restaurant.address}</p>

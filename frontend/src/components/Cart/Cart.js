@@ -63,7 +63,8 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       const orderData = {
         restaurant: cartItems[0].restaurantId,
         items: cartItems.map(item => ({
-          menuItem: item.id,
+          menuItem: item.id, // Keep the item ID
+          name: item.name,   // Add the item name
           quantity: item.quantity,
           size: item.size,
         })),

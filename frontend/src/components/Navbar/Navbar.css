@@ -126,13 +126,24 @@
   align-items: center;
   margin-bottom: 20px;
   width: 100%;
+  position: relative; /* Needed for absolute positioning of the logo */
+}
+
+/* Logo Styles */
+.logo {
+  position: absolute; /* Position the logo absolutely */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-54%); /* Adjust for exact centering */
+  top: -100px; /* Adjust top spacing as needed */
+  height: 370px; /* Adjust logo size */
+  width: auto;
 }
 
 /* Cart Icon */
 .cart-icon {
   font-size: 2rem;
   color: #333; /* Ensures visibility */
-  margin-right: 30px;
+  margin-right: 30px; /* Keep the cart icon on the right */
 }
 
 .cart-icon a {
@@ -245,5 +256,11 @@
 
   .content.shifted {
     margin-top: 150px; /* Adjust top margin when expanded */
+  }
+
+  /* Adjust logo positioning for mobile */
+  .logo {
+    top: 5px; /* Reduce top spacing for mobile */
+    height: 30px; /* Reduce logo size for mobile */
   }
 }

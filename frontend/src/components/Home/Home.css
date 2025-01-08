@@ -152,6 +152,7 @@
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   box-shadow: 5px 5px 0 #000;
   margin-top: 20px;
+  margin-left: 20px; 
 }
 
 .restaurant-card:hover {
@@ -210,14 +211,4 @@
     padding: 20px;
     padding-top: 60px; /* Adjusted for mobile screens */
   }
-}
-/* Logo Container Styling */
-.logo-container {
-  text-align: center; /* Center the logo */
-  margin-bottom: 20px; /* Add space below the logo */
-}
-
-.logo {
-  height: 50px; /* Adjust the height as needed */
-  width: auto; /* Maintain aspect ratio */
 }

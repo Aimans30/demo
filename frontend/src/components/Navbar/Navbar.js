@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { FaShoppingCart, FaBars } from "react-icons/fa";
+import logo from "./mujbites.png"; // Adjust the path to your logo image
 
 function Navbar({ onCartClick }) {
   const location = useLocation();
@@ -102,6 +103,10 @@ function Navbar({ onCartClick }) {
       {isHomePage && (
         <div className={`content ${isOpen ? "shifted" : ""}`}>
           <div className="header">
+            {/* Logo at the top center */}
+            <img src={logo} alt="Logo" className="logo" />
+
+            {/* Cart icon below the logo */}
             {isLoggedIn && (
               <div className="cart-icon">
                 <button onClick={onCartClick}>

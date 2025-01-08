@@ -37,7 +37,7 @@ const isRestaurantOwner = async (req, res, next) => {
       return res.status(403).json({ message: 'Forbidden: Access denied' });
     }
     req.user = user;
-    req.restaurant = restaurant; // Add this line to attach the restaurant to the request
+    req.restaurant = restaurant;
     next();
   } catch (error) {
     res.status(500).json({ message: 'Server error in authentication' });
@@ -49,9 +49,8 @@ const isRestaurantOwner = async (req, res, next) => {
 // Get all restaurants
 router.get('/', async (req, res) => {
   try {
-    // Remove the isActive filter to fetch all restaurants
     const restaurants = await Restaurant.find({})
-      .populate('owner', 'username')
+      .populate('owner', 'username mobileNumber') // Populate owner with mobileNumber
       .select('-menu');
 
     res.json(restaurants);
@@ -67,9 +66,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const restaurant = await Restaurant.findOne({ 
-      _id: req.params.id // Remove the isActive filter
+      _id: req.params.id
     })
-    .populate('owner', 'username')
+    .populate('owner', 'username mobileNumber') // Populate owner with mobileNumber
     .select('-menu.isAvailable -menu.createdAt -menu.updatedAt');
     
     if (!restaurant) {
@@ -91,7 +90,7 @@ router.get('/:id', async (req, res) => {
 router.get('/admin/restaurants', authenticateToken, isAdmin, async (req, res) => {
   try {
     const restaurants = await Restaurant.find({})
-      .populate('owner', 'username email')
+      .populate('owner', 'username email mobileNumber') // Populate owner with mobileNumber
       .sort({ createdAt: -1 });
     res.json(restaurants);
   } catch (error) {
@@ -220,12 +219,10 @@ router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async 
     const { status, startDate, endDate } = req.query;
     let query = { restaurant: req.params.restaurantId };
 
-    // Add status filter if provided
     if (status) {
       query.orderStatus = status;
     }
 
-    // Add date range filter if provided
     if (startDate && endDate) {
       query.createdAt = {
         $gte: new Date(startDate),
@@ -234,26 +231,11 @@ router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async 
     }
 
     const orders = await Order.find(query)
-      .populate('customer', 'username email phone address') // Include phone and address
+      .populate('customer', 'username mobileNumber address') // Ensure mobileNumber is included
+      .populate('items.menuItem', 'name price sizes') // Populate menu items including sizes
       .sort({ createdAt: -1 });
 
-    // Filter customer details based on order status
-    const filteredOrders = orders.map(order => {
-      if (order.orderStatus === 'Placed') {
-        // Hide customer details for pending orders
-        return {
-          ...order._doc,
-          customer: {
-            address: order.customer.address,
-          },
-        };
-      } else {
-        // Show all details for accepted/completed orders
-        return order;
-      }
-    });
-
-    res.json(filteredOrders);
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ 
       message: 'Error fetching orders', 
@@ -338,7 +320,6 @@ router.post('/:restaurantId/menu', authenticateToken, isRestaurantOwner, async (
 
     res.status(201).json({ message: 'Menu item added successfully', menu: restaurant.menu });
   } catch (error) {
-    console.error("Error adding menu item:", error);
     res.status(500).json({ message: 'Error adding menu item', error: error.message });
   }
 });
@@ -370,7 +351,6 @@ router.put('/menu/:itemId', authenticateToken, async (req, res) => {
     await restaurant.save();
     res.json({ message: 'Menu item updated', menu: restaurant.menu });
   } catch (error) {
-    console.error("Error updating menu item:", error);
     res.status(500).json({ message: 'Error updating menu item', error: error.message });
   }
 });
@@ -400,7 +380,6 @@ router.delete('/menu/:itemId', authenticateToken, async (req, res) => {
 
     res.json({ message: 'Menu item removed', menu: restaurant.menu });
   } catch (error) {
-    console.error("Error deleting menu item:", error);
     res.status(500).json({ message: 'Error deleting menu item', error: error.message });
   }
 });
