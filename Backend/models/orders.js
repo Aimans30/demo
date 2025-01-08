@@ -7,7 +7,6 @@ const orderSchema = new mongoose.Schema({
   items: [
     {
       menuItem: { type: mongoose.Schema.Types.ObjectId, ref: "MenuItem", required: true },
-      name: { type: String, required: true }, // Add this field for the item name
       quantity: { type: Number, required: true },
       size: { type: String, required: true },
     },

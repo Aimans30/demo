@@ -232,7 +232,7 @@ router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async 
 
     const orders = await Order.find(query)
       .populate('customer', 'username mobileNumber address') // Ensure mobileNumber is included
-      .populate('items.menuItem', 'name price') // Populate menu items
+      .populate('items.menuItem', 'name price sizes') // Populate menu items including sizes
       .sort({ createdAt: -1 });
 
     res.json(orders);

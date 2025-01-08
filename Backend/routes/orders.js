@@ -42,15 +42,13 @@ router.post("/", authenticateToken, async (req, res) => {
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const customerId = req.user.userId; // Get the user ID from the token
-    console.log("Fetching orders for customer ID:", customerId); // Debug log
 
     // Fetch orders for the logged-in user
     const orders = await Order.find({ customer: customerId })
-      .populate("restaurant", "name") // Populate restaurant details
-      .populate("items.menuItem", "name price") // Populate menu item details
+      .populate("restaurant", "name")
+      .populate("items.menuItem", "name price sizes")
       .sort({ createdAt: -1 });
 
-    console.log("Orders fetched:", orders); // Debug log
     res.status(200).json({ orders });
   } catch (error) {
     console.error("Error fetching orders:", error.message);
