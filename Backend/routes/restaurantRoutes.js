@@ -222,7 +222,7 @@ router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async 
 
     // Add status filter if provided
     if (status) {
-      query.status = status;
+      query.orderStatus = status;
     }
 
     // Add date range filter if provided
@@ -234,10 +234,26 @@ router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async 
     }
 
     const orders = await Order.find(query)
-      .populate('customer', 'username email') // Update 'user' to 'customer'
+      .populate('customer', 'username email phone address') // Include phone and address
       .sort({ createdAt: -1 });
 
-    res.json(orders);
+    // Filter customer details based on order status
+    const filteredOrders = orders.map(order => {
+      if (order.orderStatus === 'Placed') {
+        // Hide customer details for pending orders
+        return {
+          ...order._doc,
+          customer: {
+            address: order.customer.address,
+          },
+        };
+      } else {
+        // Show all details for accepted/completed orders
+        return order;
+      }
+    });
+
+    res.json(filteredOrders);
   } catch (error) {
     res.status(500).json({ 
       message: 'Error fetching orders', 

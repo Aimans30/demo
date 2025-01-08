@@ -2,7 +2,7 @@
 .home-page {
   padding: 40px;
   padding-top: 100px; /* Adjusted for space without logo */
-  background-color: #f8f8f8;
+  background-color: transparent; /* Make the background transparent */
   min-height: 100vh;
   font-family: 'Roboto', Arial, sans-serif;
   position: relative;
@@ -210,4 +210,14 @@
     padding: 20px;
     padding-top: 60px; /* Adjusted for mobile screens */
   }
+}
+/* Logo Container Styling */
+.logo-container {
+  text-align: center; /* Center the logo */
+  margin-bottom: 20px; /* Add space below the logo */
+}
+
+.logo {
+  height: 50px; /* Adjust the height as needed */
+  width: auto; /* Maintain aspect ratio */
 }

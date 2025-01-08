@@ -72,7 +72,7 @@ const YourOrders = () => {
                   <ul>
                     {order.items?.map((item, index) => (
                       <li key={index}>
-                        {item.name} - {item.quantity}x
+                        {item.menuItem?.name || 'Unknown Item'} - {item.quantity}x
                       </li>
                     )) || <li>No items available</li>}
                   </ul>

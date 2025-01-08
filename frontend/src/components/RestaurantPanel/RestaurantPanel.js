@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './RestaurantPanel.css';
 
-// Configure axios defaults
 axios.defaults.baseURL = 'http://localhost:5000';
 
 const RestaurantPanel = () => {
@@ -10,11 +9,10 @@ const RestaurantPanel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [restaurantId, setRestaurantId] = useState(null);
-  const [activeTab, setActiveTab] = useState('pending'); // For filtering orders
+  const [activeTab, setActiveTab] = useState('pending');
   const [menu, setMenu] = useState([]);
   const [showAddItemForm, setShowAddItemForm] = useState(false);
 
-  // Fetch restaurant ID on component mount
   useEffect(() => {
     const fetchRestaurantId = async () => {
       try {
@@ -24,7 +22,7 @@ const RestaurantPanel = () => {
         });
         if (response.data.restaurant) {
           setRestaurantId(response.data.restaurant._id);
-          fetchMenu(response.data.restaurant._id); // Fetch menu once we have restaurant ID
+          fetchMenu(response.data.restaurant._id);
         } else {
           setError('No restaurant associated with this account.');
           setLoading(false);
@@ -38,7 +36,6 @@ const RestaurantPanel = () => {
     fetchRestaurantId();
   }, []);
 
-  // Fetch menu function
   const fetchMenu = async (id) => {
     try {
       const token = localStorage.getItem('token');
@@ -51,7 +48,6 @@ const RestaurantPanel = () => {
     }
   };
 
-  // Fetch orders with periodic refresh
   useEffect(() => {
     const fetchOrders = async () => {
       if (!restaurantId) return;
@@ -80,12 +76,11 @@ const RestaurantPanel = () => {
 
     if (restaurantId) {
       fetchOrders();
-      const intervalId = setInterval(fetchOrders, 30000); // Refresh every 30 seconds
+      const intervalId = setInterval(fetchOrders, 30000);
       return () => clearInterval(intervalId);
     }
   }, [restaurantId]);
 
-  // Handle order status updates
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
@@ -103,11 +98,10 @@ const RestaurantPanel = () => {
     }
   };
 
-  // Filter orders based on active tab
   const filteredOrders = orders.filter(order => {
     switch (activeTab) {
       case 'pending':
-        return ['Placed', 'Accepted', 'Preparing'].includes(order.orderStatus);
+        return ['Placed', 'Accepted', 'Preparing', 'Ready'].includes(order.orderStatus);
       case 'completed':
         return order.orderStatus === 'Delivered';
       case 'cancelled':
@@ -117,130 +111,160 @@ const RestaurantPanel = () => {
     }
   });
 
-  // Function to format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
   };
 
-  // Function to calculate total items in an order
+  const formatPrice = (price) => {
+    if (isNaN(price)) {
+      return '₹0.00';
+    }
+    return `₹${Number(price).toFixed(2)}`;
+  };
+
   const calculateTotalItems = (orderItems) => {
     return orderItems.reduce((total, item) => total + item.quantity, 0);
   };
 
   return (
     <div className="restaurant-panel">
-      <h1>Restaurant Dashboard</h1>
-      
+      {/* Heading and Buttons */}
+      <div className="dashboard-header">
+        <h1>Restaurant Dashboard</h1>
+        <div className="toggle-buttons">
+          <button
+            className={activeTab === 'pending' ? 'active' : ''}
+            onClick={() => setActiveTab('pending')}
+          >
+            Pending Orders
+          </button>
+          <button
+            className={activeTab === 'completed' ? 'active' : ''}
+            onClick={() => setActiveTab('completed')}
+          >
+            Completed Orders
+          </button>
+          <button
+            className={activeTab === 'cancelled' ? 'active' : ''}
+            onClick={() => setActiveTab('cancelled')}
+          >
+            Cancelled Orders
+          </button>
+        </div>
+      </div>
+
       {loading ? (
         <div className="loading">Loading...</div>
       ) : error ? (
         <div className="error-message">{error}</div>
       ) : (
-        <>
-          {/* Order Status Tabs */}
-          <div className="status-tabs">
-            <button 
-              className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
-              onClick={() => setActiveTab('pending')}
-            >
-              Pending Orders
-            </button>
-            <button 
-              className={`tab ${activeTab === 'completed' ? 'active' : ''}`}
-              onClick={() => setActiveTab('completed')}
-            >
-              Completed Orders
-            </button>
-            <button 
-              className={`tab ${activeTab === 'cancelled' ? 'active' : ''}`}
-              onClick={() => setActiveTab('cancelled')}
-            >
-              Cancelled Orders
-            </button>
-          </div>
-
-          {/* Orders List */}
-          <div className="orders-list">
-            {filteredOrders.length === 0 ? (
-              <p className="no-orders">No {activeTab} orders found.</p>
-            ) : (
-              filteredOrders.map((order) => (
-                <div key={order._id} className="order-card">
-                  <div className="order-header">
-                    <span className="order-id">Order #{order._id.slice(-6)}</span>
-                    <span className={`order-status ${order.orderStatus.toLowerCase()}`}>
-                      {order.orderStatus}
-                    </span>
-                  </div>
-
-                  <div className="order-details">
-                    <p>
-                      <strong>Customer:</strong> {order.customer?.username || 'Anonymous'}
-                    </p>
-                    <p>
-                      <strong>Total Items:</strong> {calculateTotalItems(order.items)}
-                    </p>
-                    <p>
-                      <strong>Amount:</strong> ₹{order.totalAmount}
-                    </p>
-                    <p>
-                      <strong>Ordered at:</strong> {formatDate(order.createdAt)}
-                    </p>
-                  </div>
-
-                  <div className="order-items">
-                    <h4>Order Items:</h4>
-                    <ul>
-                      {order.items.map((item, index) => (
-                        <li key={index}>
-                          {item.itemName} - {item.size} - Quantity: {item.quantity}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Order Actions */}
-                  {['Placed', 'Accepted', 'Preparing'].includes(order.orderStatus) && (
-                    <div className="order-actions">
-                      {order.orderStatus === 'Placed' && (
-                        <>
-                          <button 
-                            className="accept-btn"
-                            onClick={() => handleOrderStatusUpdate(order._id, 'Accepted')}
-                          >
-                            Accept
-                          </button>
-                          <button 
-                            className="cancel-btn"
-                            onClick={() => handleOrderStatusUpdate(order._id, 'Cancelled')}
-                          >
-                            Decline
-                          </button>
-                        </>
-                      )}
-                      {order.orderStatus === 'Accepted' && (
-                        <button 
-                          className="prepare-btn"
-                          onClick={() => handleOrderStatusUpdate(order._id, 'Preparing')}
-                        >
-                          Start Preparing
-                        </button>
-                      )}
-                      {order.orderStatus === 'Preparing' && (
-                        <button 
-                          className="ready-btn"
-                          onClick={() => handleOrderStatusUpdate(order._id, 'Ready')}
-                        >
-                          Mark as Ready
-                        </button>
-                      )}
-                    </div>
-                  )}
+        <div className="orders-container">
+          {filteredOrders.length === 0 ? (
+            <p className="no-orders">No {activeTab} orders found.</p>
+          ) : (
+            filteredOrders.map((order) => (
+              <div key={order._id} className="card">
+                <div className="order-header">
+                  <span className="order-id">Order #{order._id.slice(-6)}</span>
+                  <span className={`order-status ${order.orderStatus.toLowerCase()}`}>
+                    {order.orderStatus}
+                  </span>
                 </div>
-              ))
-            )}
-          </div>
-        </>
+
+                <div className="order-details">
+                  <p>
+                    <strong>Customer:</strong> {order.customer?.username || 'Anonymous'}
+                  </p>
+                  {order.orderStatus !== 'Placed' && (
+                    <>
+                      <p>
+                        <strong>Phone:</strong> {order.customer?.phone || 'N/A'}
+                      </p>
+                      <p>
+                        <strong>Address:</strong> {order.customer?.address || 'N/A'}
+                      </p>
+                    </>
+                  )}
+                  <p>
+                    <strong>Total Items:</strong> {calculateTotalItems(order.items)}
+                  </p>
+                  <p>
+                    <strong>Amount:</strong> {formatPrice(order.totalAmount)}
+                  </p>
+                  <p>
+                    <strong>Ordered at:</strong> {formatDate(order.createdAt)}
+                  </p>
+                </div>
+
+                <div className="order-items">
+                  <h4>Order Items:</h4>
+                  <ul>
+                    {order.items.map((item, index) => (
+                      <li key={index} className="order-item">
+                        <div className="item-details">
+                          <span className="item-name">{item.menuItem?.name || 'Unknown Item'}</span>
+                          <span className="item-size">{item.size}</span>
+                          <span className="item-quantity">x{item.quantity}</span>
+                          <span className="item-price">{formatPrice(item.price * item.quantity)}</span>
+                        </div>
+                        {item.notes && (
+                          <div className="item-notes">
+                            Note: {item.notes}
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {['Placed', 'Accepted', 'Preparing', 'Ready'].includes(order.orderStatus) && (
+                  <div className="order-actions">
+                    {order.orderStatus === 'Placed' && (
+                      <>
+                        <button
+                          className="accept-btn"
+                          onClick={() => handleOrderStatusUpdate(order._id, 'Accepted')}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="cancel-btn"
+                          onClick={() => handleOrderStatusUpdate(order._id, 'Cancelled')}
+                        >
+                          Decline
+                        </button>
+                      </>
+                    )}
+                    {order.orderStatus === 'Accepted' && (
+                      <button
+                        className="prepare-btn"
+                        onClick={() => handleOrderStatusUpdate(order._id, 'Preparing')}
+                      >
+                        Start Preparing
+                      </button>
+                    )}
+                    {order.orderStatus === 'Preparing' && (
+                      <button
+                        className="ready-btn"
+                        onClick={() => handleOrderStatusUpdate(order._id, 'Ready')}
+                      >
+                        Mark as Ready
+                      </button>
+                    )}
+                    {order.orderStatus === 'Ready' && (
+                      <button
+                        className="deliver-btn"
+                        onClick={() => handleOrderStatusUpdate(order._id, 'Delivered')}
+                      >
+                        Mark as Delivered
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       )}
     </div>
   );
