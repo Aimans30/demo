@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./YourOrders.css";
+import Loader from '../Loader/Loader'; // Import the Loader component
 
 const YourOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Added loading state
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
+      setLoading(true); // Show loader while fetching orders
       try {
         const token = localStorage.getItem("token");
         const response = await fetch("http://localhost:5000/api/orders", {
@@ -17,17 +19,17 @@ const YourOrders = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json(); // Parse error response
+          const errorData = await response.json();
           throw new Error(errorData.message || "Failed to fetch orders");
         }
 
         const data = await response.json();
         setOrders(data.orders);
-        setLoading(false);
       } catch (err) {
-        console.error("Error fetching orders:", err.message); // Log the error
+        console.error("Error fetching orders:", err.message);
         setError(err.message);
-        setLoading(false);
+      } finally {
+        setLoading(false); // Hide loader after fetching orders
       }
     };
 
@@ -35,7 +37,7 @@ const YourOrders = () => {
   }, []);
 
   if (loading) {
-    return <div className="your-orders-loading">Loading your orders...</div>;
+    return <Loader />; // Show loader while loading
   }
 
   if (error) {

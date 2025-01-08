@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Profile.css";
+import Loader from '../Loader/Loader'; // Import the Loader component
 
 const Profile = () => {
   const [profile, setProfile] = useState({
-    username: "", // Changed fullName to username
-    mobileNumber: "", // Changed phoneNumber to mobileNumber
+    username: "",
+    mobileNumber: "",
     address: "",
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Added loading state
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    // Fetch the user profile on component mount
     const fetchProfile = async () => {
+      setLoading(true); // Show loader while fetching profile
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get("/api/users/profile", {
@@ -33,11 +38,11 @@ const Profile = () => {
           newPassword: "",
           confirmNewPassword: "",
         });
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching profile:", error.response ? error.response.data.message : error.message);
         setErrorMessage("Failed to load profile. Please try again.");
-        setLoading(false);
+      } finally {
+        setLoading(false); // Hide loader after fetching profile
       }
     };
 
@@ -53,21 +58,7 @@ const Profile = () => {
     e.preventDefault();
     setSuccessMessage("");
     setErrorMessage("");
-
-    // Password validation (frontend)
-    if (profile.newPassword !== profile.confirmNewPassword) {
-      setErrorMessage("New password and confirm new password do not match.");
-      return;
-    }
-
-    if (profile.newPassword) {
-      if (!/(?=.*[A-Z])(?=.*\d)/.test(profile.newPassword)) {
-        setErrorMessage(
-          "New password must contain at least one capital letter and one number."
-        );
-        return;
-      }
-    }
+    setLoading(true); // Show loader while updating profile
 
     try {
       const token = localStorage.getItem("token");
@@ -87,12 +78,6 @@ const Profile = () => {
         }
       );
 
-      // Check for password error from the backend
-      if (response.data.error) {
-        setErrorMessage(response.data.message);
-        return;
-      }
-
       setSuccessMessage("Profile updated successfully.");
       setProfile({
         ...profile,
@@ -103,11 +88,13 @@ const Profile = () => {
     } catch (error) {
       console.error("Error updating profile:", error.response ? error.response.data.message : error.message);
       setErrorMessage("Failed to update profile. Please try again.");
+    } finally {
+      setLoading(false); // Hide loader after updating profile
     }
   };
 
   if (loading) {
-    return <div className="profile-container">Loading...</div>;
+    return <Loader />; // Show loader while loading
   }
 
   return (
@@ -124,7 +111,7 @@ const Profile = () => {
             name="username"
             value={profile.username}
             onChange={handleChange}
-            
+            readOnly
             className="input"
             placeholder="Enter User Name"
           />
@@ -137,7 +124,7 @@ const Profile = () => {
             name="mobileNumber"
             value={profile.mobileNumber}
             onChange={handleChange}
-            
+            readOnly
             className="input"
             placeholder="Enter Phone Number"
           />
@@ -150,47 +137,72 @@ const Profile = () => {
             name="address"
             value={profile.address}
             onChange={handleChange}
-            
             className="input"
             placeholder="Enter Address"
           />
         </div>
-        <div className="form-group">
+        <div className="form-group password-group">
           <label htmlFor="oldPassword">Old Password:</label>
-          <input
-            type="password"
-            id="oldPassword"
-            name="oldPassword"
-            value={profile.oldPassword}
-            onChange={handleChange}
-            
-            className="input"
-            placeholder="Enter Old Password"
-          />
+          <div className="password-input-container">
+            <input
+              type={showOldPassword ? "text" : "password"}
+              id="oldPassword"
+              name="oldPassword"
+              value={profile.oldPassword}
+              onChange={handleChange}
+              className="input"
+              placeholder="Enter Old Password"
+              required
+            />
+            <span
+              className="password-toggle-icon"
+              onClick={() => setShowOldPassword(!showOldPassword)}
+            >
+              {showOldPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
         </div>
-        <div className="form-group">
+        <div className="form-group password-group">
           <label htmlFor="newPassword">New Password:</label>
-          <input
-            type="password"
-            id="newPassword"
-            name="newPassword"
-            value={profile.newPassword}
-            onChange={handleChange}
-            className="input"
-            placeholder="Enter New Password"
-          />
+          <div className="password-input-container">
+            <input
+              type={showNewPassword ? "text" : "password"}
+              id="newPassword"
+              name="newPassword"
+              value={profile.newPassword}
+              onChange={handleChange}
+              className="input"
+              placeholder="Enter New Password"
+              required
+            />
+            <span
+              className="password-toggle-icon"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+            >
+              {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
         </div>
-        <div className="form-group">
+        <div className="form-group password-group">
           <label htmlFor="confirmNewPassword">Confirm New Password:</label>
-          <input
-            type="password"
-            id="confirmNewPassword"
-            name="confirmNewPassword"
-            value={profile.confirmNewPassword}
-            onChange={handleChange}
-            className="input"
-            placeholder="Confirm New Password"
-          />
+          <div className="password-input-container">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmNewPassword"
+              name="confirmNewPassword"
+              value={profile.confirmNewPassword}
+              onChange={handleChange}
+              className="input"
+              placeholder="Confirm New Password"
+              required
+            />
+            <span
+              className="password-toggle-icon"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
         </div>
         <button type="submit" className="btn-save">
           Save Changes

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Signup.css";
+import Loader from '../../Loader/Loader'; // Import the Loader component
 
 function Signup({ onSignup }) {
   const [name, setName] = useState("");
@@ -18,7 +19,7 @@ function Signup({ onSignup }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsLoading(true); // Show loader while signing up
 
     if (mobileNumber.length !== 10) {
       showPopup("Mobile number must be 10 digits long.", "error");
@@ -30,18 +31,17 @@ function Signup({ onSignup }) {
       const response = await axios.post(
         "http://localhost:5000/api/users/register",
         {
-          username: name, // Include username
+          username: name,
           mobileNumber,
           password,
-          email: "", // Add email if needed
-          role: "user", // Default role is 'user'
+          email: "",
+          role: "user",
         }
       );
 
       if (response.status === 201) {
         showPopup("Signup successful! Logging in...", "success");
 
-        // Automatically log in the user after successful signup
         const loginResponse = await axios.post(
           "http://localhost:5000/api/users/login",
           {
@@ -56,13 +56,12 @@ function Signup({ onSignup }) {
           localStorage.setItem("userId", loginResponse.data.user._id);
           localStorage.setItem("username", loginResponse.data.user.username);
 
-          // Clear form fields
           setName("");
           setMobileNumber("");
           setPassword("");
 
-          // Update App.js state and trigger navigation
-          onSignup(loginResponse.data.user); 
+          onSignup(loginResponse.data.user);
+          navigate("/");
         } else {
           showPopup("Invalid response from server during login", "error");
         }
@@ -79,15 +78,22 @@ function Signup({ onSignup }) {
       }
       showPopup(errorMessage, "error");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Hide loader after signing up
     }
   };
+
+  if (isLoading) {
+    return <Loader />; // Show loader while signing up
+  }
 
   return (
     <div className="signup-container">
       <form className="signup-form" onSubmit={handleSubmit}>
-        {/* Name Input */}
-        <div className="input__container input__container--name">
+        <div className="title">
+          Welcome,<br /><span>sign up to continue</span>
+        </div>
+
+        <div className="input__container">
           <input
             type="text"
             className="input__search"
@@ -97,11 +103,9 @@ function Signup({ onSignup }) {
             required
             disabled={isLoading}
           />
-          <div className="shadow__input"></div>
         </div>
 
-        {/* Mobile Number Input */}
-        <div className="input__container input__container--phone">
+        <div className="input__container">
           <input
             type="tel"
             className="input__search"
@@ -113,11 +117,9 @@ function Signup({ onSignup }) {
             pattern="[0-9]{10}"
             maxLength="10"
           />
-          <div className="shadow__input"></div>
         </div>
 
-        {/* Password Input */}
-        <div className="input__container input__container--password">
+        <div className="input__container">
           <input
             type="password"
             className="input__search"
@@ -128,23 +130,20 @@ function Signup({ onSignup }) {
             disabled={isLoading}
             minLength="6"
           />
-          <div className="shadow__input"></div>
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className={`signup-button ${isLoading ? "loading" : ""}`}
+          className="signup-button"
         >
           {isLoading ? "Signing up..." : "Sign Up"}
         </button>
 
-        {/* Sign In Link */}
         <div className="signin-link">
           Already a member? <Link to="/login">Sign in</Link>
         </div>
 
-        {/* Popup Message */}
         {popup.message && (
           <div className={`popup ${popup.type}`}>
             {popup.message}

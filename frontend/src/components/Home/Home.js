@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './Home.css';
+import Loader from '../Loader/Loader'; // Import the Loader component
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Added loading state
 
   useEffect(() => {
     const fetchRestaurants = async () => {
-      setLoading(true);
+      setLoading(true); // Show loader while fetching restaurants
       try {
-        // Use the full backend URL if necessary
         const response = await axios.get('http://localhost:5000/api/restaurants');
         if (response.status === 200) {
           setRestaurants(response.data);
@@ -25,7 +25,7 @@ const Home = () => {
         console.error('Error fetching restaurants:', err.response ? err.response.data : err.message);
         setError('Error fetching restaurant data. Please try again.');
       } finally {
-        setLoading(false);
+        setLoading(false); // Hide loader after fetching restaurants
       }
     };
 
@@ -36,18 +36,20 @@ const Home = () => {
     setSearchQuery(event.target.value);
   };
 
-  // Apply filter only if searchQuery is not empty
   const filteredRestaurants = searchQuery
     ? restaurants.filter(restaurant =>
       restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
     : restaurants;
 
+  if (loading) {
+    return <Loader />; // Show loader while loading
+  }
+
   return (
     <div className="home-page">
-      <div className="logo-container">
-<img src={process.env.PUBLIC_URL + "/logo.png"} alt="Logo" className="logo" />
-</div>
+      <h1 className="site-heading">MujBites</h1>
+      <div className="logo-container"></div>
       <div className="search-container">
         <form className="form">
           <label htmlFor="searchInput">
@@ -104,25 +106,21 @@ const Home = () => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {loading ? (
-        <div>Loading restaurants...</div>
-      ) : (
-        <div className="restaurant-list">
-          {filteredRestaurants.length === 0 ? (
-            <div className="no-restaurants">No restaurants available</div>
-          ) : (
-            filteredRestaurants.map((restaurant) => (
-              <Link to={`/restaurant/${restaurant._id}`} key={restaurant._id} className="restaurant-card">
-                <img src={restaurant.imageUrl || 'https://via.placeholder.com/150'} alt={restaurant.name} />
-                <div className="restaurant-info">
-                  <h3>{restaurant.name}</h3>
-                  <p>{restaurant.address}</p>
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
-      )}
+      <div className="restaurant-list">
+        {filteredRestaurants.length === 0 ? (
+          <div className="no-restaurants">No restaurants available</div>
+        ) : (
+          filteredRestaurants.map((restaurant) => (
+            <Link to={`/restaurant/${restaurant._id}`} key={restaurant._id} className="restaurant-card">
+              <img src={restaurant.imageUrl || 'https://via.placeholder.com/150'} alt={restaurant.name} />
+              <div className="restaurant-info">
+                <h3>{restaurant.name}</h3>
+                <p>{restaurant.address}</p>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
     </div>
   );
 };

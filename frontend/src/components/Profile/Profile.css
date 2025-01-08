@@ -184,3 +184,42 @@
     opacity: 0;
   }
 }
+/* Add this to your existing CSS */
+.btn-toggle {
+  padding: 10px 15px;
+  border: none;
+  outline: none;
+  background-color: #333;
+  color: #eee;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-out;
+  margin-bottom: 15px;
+}
+
+.btn-toggle:hover {
+  background-color: #555;
+}
+/* Add this to your existing CSS */
+.password-group {
+  position: relative;
+}
+
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.password-toggle-icon:hover {
+  color: #000;
+}

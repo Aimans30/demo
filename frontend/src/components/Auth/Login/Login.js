@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
+import Loader from '../../Loader/Loader'; // Import the Loader component
 
 function Login({ onLogin }) {
   const [mobileNumber, setMobileNumber] = useState("");
@@ -19,7 +20,6 @@ function Login({ onLogin }) {
     event.preventDefault();
     setIsLoading(true);
 
-    // Validate mobile number length
     if (mobileNumber.length !== 10) {
       showPopup("Mobile number must be 10 digits long.", "error");
       setIsLoading(false);
@@ -33,7 +33,6 @@ function Login({ onLogin }) {
       });
 
       if (response.data.token && response.data.user) {
-        // Store token and user data
         localStorage.setItem("userToken", response.data.token);
         localStorage.setItem("userRole", response.data.user.role || "user");
         localStorage.setItem("userId", response.data.user._id);
@@ -44,8 +43,8 @@ function Login({ onLogin }) {
         setMobileNumber("");
         setPassword("");
 
-        // Use onLogin to update App state and trigger navigation
         onLogin({ mobileNumber, password });
+        navigate("/");
       } else {
         showPopup("Invalid response from server", "error");
       }
@@ -81,14 +80,20 @@ function Login({ onLogin }) {
     }
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit}>
-        <div className="input__container input__container--phone">
+        <div className="title">Welcome,<br /><span>sign in to continue</span></div>
+
+        <div className="input__container">
           <input
             type="tel"
             className="input__search"
-            placeholder="Enter your phone number"
+            placeholder="Phone Number"
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
             required
@@ -96,42 +101,33 @@ function Login({ onLogin }) {
             pattern="[0-9]{10}"
             maxLength="10"
           />
-          <div className="shadow__input"></div>
         </div>
 
-        <div className="input__container input__container--password">
+        <div className="input__container">
           <input
             type="password"
             className="input__search"
-            placeholder="Enter your password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={isLoading}
             minLength="6"
           />
-          <div className="shadow__input"></div>
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className={`login-button ${isLoading ? "loading" : ""}`}
+          className="login-button"
         >
           {isLoading ? "Logging in..." : "Login"}
         </button>
 
-        {/* Forgot Password Link */}
-        <div className="forgot-password">
-          <a href="/forgot-password">Forgot Password?</a>
-        </div>
-
-        {/* Signup Link */}
         <div className="signup-link">
           Don't have an account? <a href="/signup">Sign up</a>
         </div>
 
-        {/* Popup Message */}
         {popup.message && (
           <div className={`popup ${popup.type}`}>
             {popup.message}

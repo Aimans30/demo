@@ -48,7 +48,6 @@ router.get("/", authenticateToken, async (req, res) => {
     const orders = await Order.find({ customer: customerId })
       .populate("restaurant", "name") // Populate restaurant details
       .populate("items.menuItem", "name price") // Populate menu item details
-      .populate("customer", "username phone address") // Populate customer details
       .sort({ createdAt: -1 });
 
     console.log("Orders fetched:", orders); // Debug log

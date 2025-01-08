@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import './RestaurantMenu.css';
+import Loader from '../Loader/Loader'; // Import the Loader component
 
 function RestaurantMenu({ addToCart }) {
   const [restaurant, setRestaurant] = useState(null);
@@ -9,9 +10,20 @@ function RestaurantMenu({ addToCart }) {
   const { id } = useParams();
   const [popupVisible, setPopupVisible] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true); // Added loading state
+  const [loaderTimeout, setLoaderTimeout] = useState(null); // Added timeout state
 
   useEffect(() => {
     const fetchRestaurant = async () => {
+      setLoading(true); // Set loading to true before fetching
+
+      // Set a timeout to hide the loader after 30min 
+      const timeout = setTimeout(() => {
+        setLoading(false);
+        setError('Request timed out. Please try again.');
+      }, 1860000); // 30min
+      setLoaderTimeout(timeout);
+
       try {
         const token = localStorage.getItem('token');
         const config = {
@@ -21,31 +33,26 @@ function RestaurantMenu({ addToCart }) {
           }
         };
 
-        // Fetch restaurant data
         const response = await axios.get(`http://localhost:5000/api/restaurants/${id}`, config);
         const restaurantData = response.data;
 
-        // Set default size for each menu item
         const updatedMenu = restaurantData.menu.map(item => {
           const sizes = Object.keys(item.sizes);
           if (sizes.length === 1) {
-            // If there's only one size, set it to "1pc" and default quantity to 1
             return {
               ...item,
-              selectedSize: sizes[0], // Set the single size as default
-              quantity: 1 // Default quantity for single-size items
+              selectedSize: sizes[0],
+              quantity: 1
             };
           } else {
-            // If multiple sizes, set default size to "Small" and quantity to 1
             return {
               ...item,
-              selectedSize: 'Small', // Default size for multiple sizes
-              quantity: 1 // Default quantity
+              selectedSize: 'Small',
+              quantity: 1
             };
           }
         });
 
-        // Update restaurant data with the modified menu
         setRestaurant({
           ...restaurantData,
           menu: updatedMenu
@@ -54,10 +61,20 @@ function RestaurantMenu({ addToCart }) {
       } catch (error) {
         console.error('Error fetching restaurant:', error);
         setError(error.response?.data?.message || 'Error fetching restaurant details');
+      } finally {
+        setLoading(false); // Set loading to false after data fetch or error
+        clearTimeout(loaderTimeout); // Clear the timeout
       }
     };
 
     fetchRestaurant();
+
+    // Cleanup function to clear the timeout if the component unmounts
+    return () => {
+      if (loaderTimeout) {
+        clearTimeout(loaderTimeout);
+      }
+    };
   }, [id]);
 
   const handleSizeChange = (itemId, size) => {
@@ -104,10 +121,7 @@ function RestaurantMenu({ addToCart }) {
       };
 
       addToCart(itemToCart);
-      
-      // Reset quantity after adding to cart
       handleQuantityChange(item._id, -item.quantity);
-      
       setPopupVisible(true);
       setTimeout(() => setPopupVisible(false), 3000);
     } else {
@@ -127,8 +141,8 @@ function RestaurantMenu({ addToCart }) {
     return <div className="error-message">{error}</div>;
   }
 
-  if (!restaurant) {
-    return <div className="loading-message">Loading...</div>;
+  if (loading && !restaurant) {
+    return <Loader />; // Show loader only if loading is true and restaurant data is not yet available
   }
 
   return (
@@ -172,7 +186,6 @@ function RestaurantMenu({ addToCart }) {
                   value={item.selectedSize || ''}
                   onChange={(e) => handleSizeChange(item._id, e.target.value)}
                 >
-                  {/* Removed the "Select Size" option */}
                   {Object.keys(item.sizes).map(size => (
                     <option key={size} value={size}>{size}</option>
                   ))}

@@ -2,13 +2,9 @@ const mongoose = require("mongoose");
 
 const menuItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  sizes: {
-    Small: { type: Number },
-    Medium: { type: Number },
-    Large: { type: Number }
-  },
+  price: { type: Number, required: true },
   description: { type: String },
-  restaurant: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant", required: true },
+  restaurant: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant", required: true }, // Reference to the Restaurant model
 });
 
 const MenuItem = mongoose.model("MenuItem", menuItemSchema);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './RestaurantPanel.css';
 
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = 'http://localhost:5000'; // Ensure this matches your backend server
 
 const RestaurantPanel = () => {
   const [orders, setOrders] = useState([]);
@@ -17,6 +17,12 @@ const RestaurantPanel = () => {
     const fetchRestaurantId = async () => {
       try {
         const token = localStorage.getItem('token');
+        if (!token) {
+          setError('No token found. Please log in again.');
+          setLoading(false);
+          return;
+        }
+
         const response = await axios.get('/api/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -128,7 +134,6 @@ const RestaurantPanel = () => {
 
   return (
     <div className="restaurant-panel">
-      {/* Heading and Buttons */}
       <div className="dashboard-header">
         <h1>Restaurant Dashboard</h1>
         <div className="toggle-buttons">
@@ -178,7 +183,7 @@ const RestaurantPanel = () => {
                   {order.orderStatus !== 'Placed' && (
                     <>
                       <p>
-                        <strong>Phone:</strong> {order.customer?.phone || 'N/A'}
+                        <strong>Mobile Number:</strong> {order.customer?.mobileNumber || 'N/A'}
                       </p>
                       <p>
                         <strong>Address:</strong> {order.customer?.address || 'N/A'}
@@ -202,7 +207,7 @@ const RestaurantPanel = () => {
                     {order.items.map((item, index) => (
                       <li key={index} className="order-item">
                         <div className="item-details">
-                          <span className="item-name">{item.menuItem?.name || 'Unknown Item'}</span>
+                          <span className="item-name">{item.name || 'Unknown Item'}</span>
                           <span className="item-size">{item.size}</span>
                           <span className="item-quantity">x{item.quantity}</span>
                           <span className="item-price">{formatPrice(item.price * item.quantity)}</span>

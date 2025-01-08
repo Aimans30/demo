@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
 import './Cart.css';
+import Loader from '../Loader/Loader'; // Import the Loader component
 
 const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -9,11 +10,13 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
   const [address, setAddress] = useState('');
   const [showAddressPopup, setShowAddressPopup] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [loading, setLoading] = useState(false); // Added loading state
 
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserAddress = async () => {
+      setLoading(true); // Show loader while fetching address
       try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -34,6 +37,8 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
         } else {
           setError('Error fetching user address. Please try again.');
         }
+      } finally {
+        setLoading(false); // Hide loader after fetching address
       }
     };
 
@@ -46,6 +51,7 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       return;
     }
 
+    setLoading(true); // Show loader while placing order
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -68,20 +74,19 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
           size: item.size,
         })),
         totalAmount: calculateTotal(),
-        address, // Include address in the order data
+        address,
       };
 
       const response = await axios.post('http://localhost:5000/api/orders', orderData, config);
 
       if (response.status === 201) {
-        setOrderPlaced(true); // Show the success popup
-        onPlaceOrder(); // Clear the cart
+        setOrderPlaced(true);
+        onPlaceOrder();
 
-        // Delay the redirection to allow the user to see the success popup
         setTimeout(() => {
-          setOrderPlaced(false); // Hide the popup before redirection
-          navigate('/your-orders'); // Redirect to the "Your Orders" page
-        }, 3000); // 3 seconds delay
+          setOrderPlaced(false);
+          navigate('/your-orders');
+        }, 3000);
       }
     } catch (error) {
       console.error('Error placing order:', error);
@@ -90,10 +95,13 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       } else {
         setError('Error placing order. Please try again.');
       }
+    } finally {
+      setLoading(false); // Hide loader after placing order
     }
   };
 
   const handleSaveAddress = async () => {
+    setLoading(true); // Show loader while saving address
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -115,7 +123,7 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       if (response.status === 200) {
         setShowAddressPopup(false);
         setIsEditingAddress(false);
-        handlePlaceOrder(); // Proceed to place the order after saving the address
+        handlePlaceOrder();
       }
     } catch (error) {
       console.error('Error saving address:', error);
@@ -124,12 +132,18 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       } else {
         setError('Error saving address. Please try again.');
       }
+    } finally {
+      setLoading(false); // Hide loader after saving address
     }
   };
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
+
+  if (loading) {
+    return <Loader />; // Show loader while loading
+  }
 
   return (
     <div className="cart-overlay">
