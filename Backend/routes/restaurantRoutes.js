@@ -45,7 +45,50 @@ const isRestaurantOwner = async (req, res, next) => {
 };
 
 // Public Routes
+router.put('/:restaurantId/set-opening-time', authenticateToken, async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { openingTime } = req.body;
 
+    // Validate input
+    if (!openingTime) {
+      return res.status(400).json({ message: 'Opening time is required' });
+    }
+
+    // Find the restaurant
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    // Update the opening time
+    restaurant.openingTime = new Date(openingTime); // Convert to Date object
+    await restaurant.save();
+
+    res.json({ message: 'Opening time set successfully', openingTime: restaurant.openingTime });
+  } catch (error) {
+    console.error('Error setting opening time:', error);
+    res.status(500).json({ message: 'Error setting opening time', error: error.message });
+  }
+});
+
+// Get opening time for the restaurant
+router.get('/:restaurantId/opening-time', authenticateToken, async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+
+    // Find the restaurant
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    res.json({ openingTime: restaurant.openingTime });
+  } catch (error) {
+    console.error('Error fetching opening time:', error);
+    res.status(500).json({ message: 'Error fetching opening time', error: error.message });
+  }
+});
 // Get all restaurants
 router.get('/', async (req, res) => {
   try {

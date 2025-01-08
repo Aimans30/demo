@@ -8,7 +8,9 @@ const restaurantSchema = new mongoose.Schema({
         ref: 'User',
         required: true 
     },
-    isActive: { type: Boolean, default: true }, // Set default to true
+    isActive: { type: Boolean, default: true },
+    openingTime: { type: Date }, // Add openingTime field
+    // Set default to true
     menu: [{ 
         itemName: { type: String, required: true },
         sizes: {

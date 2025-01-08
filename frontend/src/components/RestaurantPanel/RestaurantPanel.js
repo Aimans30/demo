@@ -14,6 +14,7 @@ const RestaurantPanel = () => {
   const [showAddItemForm, setShowAddItemForm] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [openingTime, setOpeningTime] = useState('');
+  const [currentOpeningTime, setCurrentOpeningTime] = useState(null);
 
   useEffect(() => {
     const fetchRestaurantId = async () => {
@@ -26,6 +27,7 @@ const RestaurantPanel = () => {
           setRestaurantId(response.data.restaurant._id);
           setIsOpen(response.data.restaurant.isActive || false);
           fetchMenu(response.data.restaurant._id);
+          fetchOpeningTime(response.data.restaurant._id); // Fetch opening time
         } else {
           setError('No restaurant associated with this account.');
           setLoading(false);
@@ -83,6 +85,18 @@ const RestaurantPanel = () => {
       return () => clearInterval(intervalId);
     }
   }, [fetchOrders]);
+
+  const fetchOpeningTime = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`/api/restaurants/${id}/opening-time`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCurrentOpeningTime(response.data.openingTime);
+    } catch (error) {
+      console.error('Failed to fetch opening time:', error);
+    }
+  };
 
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
     try {
@@ -147,7 +161,10 @@ const RestaurantPanel = () => {
   };
 
   const handleSetOpeningTime = async () => {
-    if (!restaurantId) return;
+    if (!restaurantId || !openingTime) {
+      alert('Please select a valid opening time.');
+      return;
+    }
 
     try {
       const token = localStorage.getItem('token');
@@ -156,10 +173,12 @@ const RestaurantPanel = () => {
         { openingTime },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert('Opening time set for tomorrow.');
-      fetchOrders();
+
+      alert('Opening time set successfully!');
+      fetchOpeningTime(restaurantId); // Refresh the opening time
     } catch (error) {
       console.error('Failed to set opening time:', error);
+      alert('Failed to set opening time. Please try again.');
     }
   };
 
@@ -204,6 +223,13 @@ const RestaurantPanel = () => {
           onChange={(e) => setOpeningTime(e.target.value)}
         />
         <button onClick={handleSetOpeningTime}>Set Opening Time</button>
+
+        {currentOpeningTime && (
+          <div>
+            <h3>Current Opening Time:</h3>
+            <p>{new Date(currentOpeningTime).toLocaleString()}</p>
+          </div>
+        )}
       </div>
       {loading ? (
         <div className="loading">Loading...</div>

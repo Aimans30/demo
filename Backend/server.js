@@ -22,9 +22,12 @@ app.use(express.json());
 app.use(helmet());
 
 // --- Connect to MongoDB ---
-const mongoURI = process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI || process.env.MONGO_URI;
 
-mongoose.connect(mongoURI)
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => {
     console.log('MongoDB connected successfully');
   })
@@ -32,6 +35,9 @@ mongoose.connect(mongoURI)
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
+
+// --- Import the Scheduler ---
+const updateRestaurantStatus = require('./scheduler');
 
 // --- Routes ---
 const restaurantRoutes = require('./routes/restaurantRoutes');
@@ -71,4 +77,7 @@ process.on('SIGINT', async () => {
 });
 
 // Start the Server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  updateRestaurantStatus(); // Run the scheduler when the server starts
+});
