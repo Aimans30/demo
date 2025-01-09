@@ -211,4 +211,16 @@
     padding: 20px;
     padding-top: 60px; /* Adjusted for mobile screens */
   }
+  .restaurant-card {
+  background-color: #fff;
+  border: 3px solid #000;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 5px 5px 0 #000;
+  margin-top: 20px;
+  margin-left: 5px; 
+}
 }

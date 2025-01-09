@@ -227,7 +227,9 @@
 
 @media (max-width: 768px) {
   .cart-container {
-    width: 100%;
+    width: 90%;
+    right: 20px;
+    height: min-content;
   }
 
   .place-order-button {

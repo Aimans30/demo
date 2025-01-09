@@ -1,6 +1,7 @@
 /* RestaurantMenu.css */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Ravens&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
 
 .restaurant-menu-page {
   padding: 50px;
@@ -16,6 +17,7 @@
 }
 
 .menu-section-title {
+  font-family: 'Playfair Display', serif; /* Apply Playfair Display font */
   font-size: 1.8rem;
   color: #333;
   margin-top: 30px;

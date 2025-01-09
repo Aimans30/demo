@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
 import './Cart.css';
 
 const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
@@ -9,15 +9,21 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
   const [address, setAddress] = useState('');
   const [showAddressPopup, setShowAddressPopup] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   useEffect(() => {
     const fetchUserAddress = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          setError('You must be logged in to view your address.');
           return;
         }
 
@@ -37,10 +43,30 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       }
     };
 
-    fetchUserAddress();
-  }, []);
+    if (isLoggedIn) {
+      fetchUserAddress();
+    }
+  }, [isLoggedIn]);
+
+  const handleInitiateOrder = () => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    setShowAddressPopup(true);
+  };
+
+  const handleRedirectToLogin = () => {
+    onClose(); // Close the cart
+    navigate('/login'); // Redirect to login page
+  };
 
   const handlePlaceOrder = async () => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     if (!address) {
       setError('Please provide a valid address.');
       return;
@@ -49,7 +75,7 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('You must be logged in to place an order.');
+        setShowLoginPrompt(true);
         return;
       }
   
@@ -63,41 +89,46 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       const orderData = {
         restaurant: cartItems[0].restaurantId,
         items: cartItems.map(item => ({
-          menuItem: item.id, // Keep the item ID
-          itemName: item.name, // Include the item name
+          menuItem: item.id,
+          itemName: item.name,
           quantity: item.quantity,
           size: item.size,
         })),
         totalAmount: calculateTotal(),
-        address, // Include address in the order data
+        address,
       };
   
       const response = await axios.post('http://localhost:5000/api/orders', orderData, config);
   
       if (response.status === 201) {
-        setOrderPlaced(true); // Show the success popup
-        onPlaceOrder(); // Clear the cart
+        setOrderPlaced(true);
+        onPlaceOrder();
   
-        // Delay the redirection to allow the user to see the success popup
         setTimeout(() => {
-          setOrderPlaced(false); // Hide the popup before redirection
-          navigate('/your-orders'); // Redirect to the "Your Orders" page
-        }, 3000); // 3 seconds delay
+          setOrderPlaced(false);
+          navigate('/your-orders');
+        }, 3000);
       }
     } catch (error) {
       console.error('Error placing order:', error);
       if (error.response?.status === 401) {
-        setError('Your session has expired. Please log in again.');
+        setShowLoginPrompt(true);
       } else {
         setError('Error placing order. Please try again.');
       }
     }
   };
+
   const handleSaveAddress = async () => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('You must be logged in to save your address.');
+        setShowLoginPrompt(true);
         return;
       }
 
@@ -115,12 +146,12 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       if (response.status === 200) {
         setShowAddressPopup(false);
         setIsEditingAddress(false);
-        handlePlaceOrder(); // Proceed to place the order after saving the address
+        handlePlaceOrder();
       }
     } catch (error) {
       console.error('Error saving address:', error);
       if (error.response?.status === 401) {
-        setError('Your session has expired. Please log in again.');
+        setShowLoginPrompt(true);
       } else {
         setError('Error saving address. Please try again.');
       }
@@ -135,7 +166,7 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
     <div className="cart-overlay">
       <div className="cart-container">
         <div className="cart-header">
-          <h2>My Orders</h2>
+          <h2>Your Cart</h2>
           <h3>{cartItems[0]?.restaurantName}</h3>
           <button className="close-button" onClick={onClose}>X</button>
         </div>
@@ -181,7 +212,7 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
                 <span>Total:</span>
                 <span>₹{calculateTotal()}</span>
               </div>
-              <button className="place-order-button" onClick={() => setShowAddressPopup(true)}>
+              <button className="place-order-button" onClick={handleInitiateOrder}>
                 Place Order
               </button>
             </div>
@@ -200,6 +231,18 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
               <button onClick={handleSaveAddress}>Save & Place Order</button>
               <button onClick={() => setShowAddressPopup(false)}>Cancel</button>
             </div>
+          </div>
+        )}
+
+        {showLoginPrompt && (
+          <div className="popup show login-prompt">
+            <p>Please log in to place your order</p>
+            <button onClick={handleRedirectToLogin} className="login-button">
+              Login
+            </button>
+            <button onClick={() => setShowLoginPrompt(false)} className="cancel-button">
+              Cancel
+            </button>
           </div>
         )}
 

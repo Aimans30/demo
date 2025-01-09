@@ -16,6 +16,8 @@ const RestaurantPanel = () => {
   const [openingTime, setOpeningTime] = useState('');
   const [currentOpeningTime, setCurrentOpeningTime] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDeclineDropdown, setShowDeclineDropdown] = useState(null); // Track which order's dropdown is open
+  const [cancellationReason, setCancellationReason] = useState(''); // Track selected cancellation reason
 
   useEffect(() => {
     const fetchRestaurantId = async () => {
@@ -99,27 +101,40 @@ const RestaurantPanel = () => {
     }
   };
 
-  const handleOrderStatusUpdate = async (orderId, newStatus) => {
+  const handleOrderStatusUpdate = async (orderId, newStatus, reason = '') => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
         `/api/restaurants/orders/${orderId}`,
-        { status: newStatus },
+        { status: newStatus, cancellationReason: reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setOrders(orders.map(order =>
-        order._id === orderId ? { ...order, orderStatus: newStatus } : order
+        order._id === orderId ? { ...order, orderStatus: newStatus, cancellationReason: reason } : order
       ));
+      setShowDeclineDropdown(null); // Close the dropdown after confirmation
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update order status.');
     }
   };
 
+  const handleDeclineOrder = (orderId) => {
+    setShowDeclineDropdown(orderId); // Show dropdown for the specific order
+  };
+
+  const handleConfirmDecline = (orderId) => {
+    if (!cancellationReason) {
+      alert('Please select a reason for cancellation.');
+      return;
+    }
+    handleOrderStatusUpdate(orderId, 'Cancelled', cancellationReason);
+  };
+
   const filteredOrders = orders.filter(order => {
     switch (activeTab) {
       case 'pending':
-        return ['Placed', 'Accepted', 'Preparing', 'Ready'].includes(order.orderStatus);
+        return ['Placed', 'Accepted'].includes(order.orderStatus);
       case 'completed':
         return order.orderStatus === 'Delivered';
       case 'cancelled':
@@ -254,7 +269,8 @@ const RestaurantPanel = () => {
                   {order.orderStatus !== 'Placed' && (
                     <>
                       <p>
-                      <strong>Phone:</strong> {order.customer?.mobileNumber || 'N/A'}                      </p>
+                        <strong>Phone:</strong> {order.customer?.mobileNumber || 'N/A'}
+                      </p>
                       <p>
                         <strong>Address:</strong> {order.customer?.address || 'N/A'}
                       </p>
@@ -276,8 +292,8 @@ const RestaurantPanel = () => {
                     {order.items.map((item, index) => (
                       <li key={index} className="order-item">
                         <div className="item-details">
-                        <span className="item-name">{item.itemName || 'Unknown Item'}</span>
-                        <span className="item-size">{item.size}</span>
+                          <span className="item-name">{item.itemName || 'Unknown Item'}</span>
+                          <span className="item-size">{item.size}</span>
                           <span className="item-quantity">x{item.quantity}</span>
                         </div>
                         {item.notes && (
@@ -289,7 +305,7 @@ const RestaurantPanel = () => {
                     ))}
                   </ul>
                 </div>
-                {['Placed', 'Accepted', 'Preparing', 'Ready'].includes(order.orderStatus) && (
+                {['Placed', 'Accepted'].includes(order.orderStatus) && (
                   <div className="order-actions">
                     {order.orderStatus === 'Placed' && (
                       <>
@@ -301,29 +317,28 @@ const RestaurantPanel = () => {
                         </button>
                         <button
                           className="cancel-btn"
-                          onClick={() => handleOrderStatusUpdate(order._id, 'Cancelled')}
+                          onClick={() => handleDeclineOrder(order._id)}
                         >
                           Decline
                         </button>
+                        {showDeclineDropdown === order._id && (
+                          <div className="decline-dropdown">
+                            <select
+                              value={cancellationReason}
+                              onChange={(e) => setCancellationReason(e.target.value)}
+                            >
+                              <option value="">Select a reason</option>
+                              <option value="Items not available">Items not available</option>
+                              <option value="Shop Closed">Shop Closed</option>
+                              <option value="Other">Other</option>
+                            </select>
+                            <button onClick={() => handleConfirmDecline(order._id)}>Confirm</button>
+                            <button onClick={() => setShowDeclineDropdown(null)}>Cancel</button>
+                          </div>
+                        )}
                       </>
                     )}
                     {order.orderStatus === 'Accepted' && (
-                      <button
-                        className="prepare-btn"
-                        onClick={() => handleOrderStatusUpdate(order._id, 'Preparing')}
-                      >
-                        Start Preparing
-                      </button>
-                    )}
-                    {order.orderStatus === 'Preparing' && (
-                      <button
-                        className="ready-btn"
-                        onClick={() => handleOrderStatusUpdate(order._id, 'Ready')}
-                      >
-                        Mark as Ready
-                      </button>
-                    )}
-                    {order.orderStatus === 'Ready' && (
                       <button
                         className="deliver-btn"
                         onClick={() => handleOrderStatusUpdate(order._id, 'Delivered')}

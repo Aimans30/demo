@@ -15,10 +15,11 @@ const orderSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   orderStatus: {
     type: String,
-    enum: ["Placed", "Accepted", "Preparing", "Ready", "Delivered", "Cancelled"],
+    enum: ["Placed", "Accepted", "Delivered", "Cancelled"], // Removed "Preparing" and "Ready"
     default: "Placed",
   },
   createdAt: { type: Date, default: Date.now },
+  cancellationReason: { type: String, default: '' }, // Add cancellation reason field
 });
 
 // Method to get the restaurant owner's ID

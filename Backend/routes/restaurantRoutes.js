@@ -289,10 +289,13 @@ router.get('/:restaurantId/orders', authenticateToken, isRestaurantOwner, async 
 });
 
 // Update order status
+// ... (other code)
+
+// Update order status
 router.put('/orders/:orderId', authenticateToken, async (req, res) => {
   try {
-    const { status } = req.body;
-    const validStatuses = ['Placed', 'Accepted', 'Preparing', 'Ready', 'Delivered', 'Cancelled'];
+    const { status, cancellationReason } = req.body;
+    const validStatuses = ['Placed', 'Accepted', 'Delivered', 'Cancelled']; // Removed "Preparing" and "Ready"
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
@@ -319,6 +322,9 @@ router.put('/orders/:orderId', authenticateToken, async (req, res) => {
     }
 
     order.orderStatus = status;
+    if (cancellationReason) {
+      order.cancellationReason = cancellationReason;
+    }
     await order.save();
 
     res.json({ message: 'Order status updated successfully', order });
@@ -327,7 +333,7 @@ router.put('/orders/:orderId', authenticateToken, async (req, res) => {
   }
 });
 
-// Get menu for a specific restaurant
+// ... (other code)// Get menu for a specific restaurant
 router.get('/:restaurantId/menu', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.restaurantId);

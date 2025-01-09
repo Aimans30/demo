@@ -67,6 +67,11 @@ const YourOrders = () => {
                 <p className="order-status">
                   <b>Status:</b> {order.orderStatus || "Unknown"}
                 </p>
+                {order.orderStatus === 'Cancelled' && order.cancellationReason && (
+                  <p className="cancellation-reason">
+                    <b>Cancellation Reason:</b> {order.cancellationReason}
+                  </p>
+                )}
                 <div className="order-items">
                   <b> Items:</b>
                   <ul>
