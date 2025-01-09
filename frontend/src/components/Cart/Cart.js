@@ -45,39 +45,39 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       setError('Please provide a valid address.');
       return;
     }
-
+  
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         setError('You must be logged in to place an order.');
         return;
       }
-
+  
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       };
-
+  
       const orderData = {
         restaurant: cartItems[0].restaurantId,
         items: cartItems.map(item => ({
           menuItem: item.id, // Keep the item ID
-          name: item.name,   // Add the item name
+          itemName: item.name, // Include the item name
           quantity: item.quantity,
           size: item.size,
         })),
         totalAmount: calculateTotal(),
         address, // Include address in the order data
       };
-
+  
       const response = await axios.post('http://localhost:5000/api/orders', orderData, config);
-
+  
       if (response.status === 201) {
         setOrderPlaced(true); // Show the success popup
         onPlaceOrder(); // Clear the cart
-
+  
         // Delay the redirection to allow the user to see the success popup
         setTimeout(() => {
           setOrderPlaced(false); // Hide the popup before redirection
@@ -93,7 +93,6 @@ const Cart = ({ cartItems, onClose, onPlaceOrder, updateQuantity }) => {
       }
     }
   };
-
   const handleSaveAddress = async () => {
     try {
       const token = localStorage.getItem('token');

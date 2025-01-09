@@ -89,6 +89,7 @@ router.get('/:restaurantId/opening-time', authenticateToken, async (req, res) =>
     res.status(500).json({ message: 'Error fetching opening time', error: error.message });
   }
 });
+
 // Get all restaurants
 router.get('/', async (req, res) => {
   try {
@@ -366,6 +367,7 @@ router.post('/:restaurantId/menu', authenticateToken, isRestaurantOwner, async (
     res.status(500).json({ message: 'Error adding menu item', error: error.message });
   }
 });
+
 // Toggle restaurant status
 router.put('/:restaurantId/toggle-status', authenticateToken, isRestaurantOwner, async (req, res) => {
   try {
@@ -396,6 +398,7 @@ router.put('/:restaurantId/set-opening-time', authenticateToken, isRestaurantOwn
     res.status(500).json({ message: 'Error setting opening time', error: error.message });
   }
 });
+
 // Update menu item
 router.put('/menu/:itemId', authenticateToken, async (req, res) => {
   try {

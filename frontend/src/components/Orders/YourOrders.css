@@ -1,6 +1,6 @@
 /* Container Styles */
 .your-orders-container {
-  max-width: 1200px; /* Centralize and constrain the width */
+  max-width: 800px; /* Centralize and constrain the width */
   margin: 20px auto; /* Center the container on the page */
   padding: 20px;
   background-color: #f9f9f9; /* Light background for contrast */
@@ -160,10 +160,14 @@
 
 @media (max-width: 480px) {
   .your-orders-container {
+    max-width: 300px;
+    max-height: fit-content; 
+    margin-top: 100px;/* Centralize and constrain the width */
     padding: 15px;
   }
 
   .your-orders-header {
+    
     font-size: 28px; /* Slightly smaller for small screens */
   }
 

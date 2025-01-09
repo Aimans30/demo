@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './RestaurantPanel.css';
+import { FaCog } from 'react-icons/fa';
 
 axios.defaults.baseURL = 'http://localhost:5000';
 
@@ -11,10 +12,10 @@ const RestaurantPanel = () => {
   const [restaurantId, setRestaurantId] = useState(null);
   const [activeTab, setActiveTab] = useState('pending');
   const [menu, setMenu] = useState([]);
-  const [showAddItemForm, setShowAddItemForm] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [openingTime, setOpeningTime] = useState('');
   const [currentOpeningTime, setCurrentOpeningTime] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     const fetchRestaurantId = async () => {
@@ -27,7 +28,7 @@ const RestaurantPanel = () => {
           setRestaurantId(response.data.restaurant._id);
           setIsOpen(response.data.restaurant.isActive || false);
           fetchMenu(response.data.restaurant._id);
-          fetchOpeningTime(response.data.restaurant._id); // Fetch opening time
+          fetchOpeningTime(response.data.restaurant._id);
         } else {
           setError('No restaurant associated with this account.');
           setLoading(false);
@@ -175,7 +176,7 @@ const RestaurantPanel = () => {
       );
 
       alert('Opening time set successfully!');
-      fetchOpeningTime(restaurantId); // Refresh the opening time
+      fetchOpeningTime(restaurantId);
     } catch (error) {
       console.error('Failed to set opening time:', error);
       alert('Failed to set opening time. Please try again.');
@@ -186,6 +187,28 @@ const RestaurantPanel = () => {
     <div className="restaurant-panel">
       <div className="dashboard-header">
         <h1>Restaurant Dashboard</h1>
+        <div className="settings-button" onClick={() => setShowSettings(!showSettings)}>
+          <div className="edit-post">
+            <span className="edit-tooltip">Settings</span>
+            <span className="edit-icon"><FaCog /></span>
+          </div>
+        </div>
+        <div className={`settings-dropdown ${showSettings ? 'open' : ''}`}>
+          <label>
+            Restaurant Status:
+            <div className="toggle-switch">
+              <input type="checkbox" checked={isOpen} onChange={handleToggleStatus} />
+              <span className="toggle-slider"></span>
+            </div>
+            {isOpen ? 'Open' : 'Closed'}
+          </label>
+          <input
+            type="datetime-local"
+            value={openingTime}
+            onChange={(e) => setOpeningTime(e.target.value)}
+          />
+          <button onClick={handleSetOpeningTime}>Set Opening Time</button>
+        </div>
         <div className="toggle-buttons">
           <button
             className={activeTab === 'pending' ? 'active' : ''}
@@ -206,30 +229,6 @@ const RestaurantPanel = () => {
             Cancelled Orders
           </button>
         </div>
-      </div>
-      <div>
-        <label>
-          Restaurant Status:
-          <input
-            type="checkbox"
-            checked={isOpen}
-            onChange={handleToggleStatus}
-          />
-          {isOpen ? 'Open' : 'Closed'}
-        </label>
-        <input
-          type="datetime-local"
-          value={openingTime}
-          onChange={(e) => setOpeningTime(e.target.value)}
-        />
-        <button onClick={handleSetOpeningTime}>Set Opening Time</button>
-
-        {currentOpeningTime && (
-          <div>
-            <h3>Current Opening Time:</h3>
-            <p>{new Date(currentOpeningTime).toLocaleString()}</p>
-          </div>
-        )}
       </div>
       {loading ? (
         <div className="loading">Loading...</div>
@@ -255,8 +254,7 @@ const RestaurantPanel = () => {
                   {order.orderStatus !== 'Placed' && (
                     <>
                       <p>
-                        <strong>Phone:</strong> {order.customer?.phone || 'N/A'}
-                      </p>
+                      <strong>Phone:</strong> {order.customer?.mobileNumber || 'N/A'}                      </p>
                       <p>
                         <strong>Address:</strong> {order.customer?.address || 'N/A'}
                       </p>
@@ -278,10 +276,9 @@ const RestaurantPanel = () => {
                     {order.items.map((item, index) => (
                       <li key={index} className="order-item">
                         <div className="item-details">
-                          <span className="item-name">{item.menuItem?.name || 'Unknown Item'}</span>
-                          <span className="item-size">{item.size}</span>
+                        <span className="item-name">{item.itemName || 'Unknown Item'}</span>
+                        <span className="item-size">{item.size}</span>
                           <span className="item-quantity">x{item.quantity}</span>
-                          <span className="item-price">{formatPrice(item.price * item.quantity)}</span>
                         </div>
                         {item.notes && (
                           <div className="item-notes">

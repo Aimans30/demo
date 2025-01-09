@@ -228,7 +228,7 @@
 /* Responsive Design for Phones */
 @media (max-width: 768px) {
   .navbar {
-    height: 50px; /* Adjust navbar height */
+    height: 60px; /* Adjust navbar height */
     width: 100%; /* Full width on top */
     flex-direction: row;
     align-items: center;
@@ -260,7 +260,7 @@
 
   /* Adjust logo positioning for mobile */
   .logo {
-    top: 5px; /* Reduce top spacing for mobile */
-    height: 30px; /* Reduce logo size for mobile */
+    top: -45px; /* Reduce top spacing for mobile */
+    height: 300px; /* Reduce logo size for mobile */
   }
 }

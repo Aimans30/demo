@@ -81,3 +81,16 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   updateRestaurantStatus(); // Run the scheduler when the server starts
 });
+
+app.get('/api/orders', async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, 'env.JWT_SECRET');
+    const userId = decoded.userId;
+
+    const orders = await Order.find({ userId }); // Assuming Order model has a userId field
+    res.json({ orders });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
