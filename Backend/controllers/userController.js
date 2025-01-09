@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const Restaurant = require('../models/restaurantModel');
-const User = require('../models/User');
+const User = require('../models/user');
 
 module.exports = {
   signup: async (req, res) => {
